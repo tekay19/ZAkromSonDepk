@@ -1,0 +1,251 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  engineType = "library"
+  binaryTargets = ["native"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Account {
+  id                 String  @id @default(cuid())
+  userId             String
+  type               String
+  provider           String
+  providerAccountId  String
+  refresh_token      String?  @db.Text
+  access_token       String?  @db.Text
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String?  @db.Text
+  session_state      String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model User {
+  id                     String              @id @default(cuid())
+  name                   String?
+  email                  String?             @unique
+  emailVerified          DateTime?
+  passwordHash           String?
+  twoFactorEnabled       Boolean             @default(false)
+  twoFactorEmailEnabled  Boolean             @default(true)
+  twoFactorTotpEnabled   Boolean             @default(false)
+  totpSecretEnc          String?
+  failedLoginCount       Int                 @default(0)
+  lockUntil              DateTime?
+  lastLoginAt            DateTime?
+  lastLoginIp            String?
+  lastLoginUserAgent     String?
+  image                  String?
+  credits                Int                 @default(100)
+  subscriptionTier       String              @default("FREE")
+  
+  // Stripe Integration
+  stripeCustomerId       String?             @unique
+  stripeSubscriptionId   String?             @unique
+  stripePriceId          String?
+  stripeCurrentPeriodEnd DateTime?
+
+  createdAt              DateTime            @default(now())
+  updatedAt              DateTime            @updatedAt
+  
+  accounts               Account[]
+  sessions               Session[]
+  transactions           CreditTransaction[]
+  searchHistory          SearchHistory[]
+  leads                  Lead[]
+  twoFactorTokens        TwoFactorToken[]
+  passwordResetTokens    PasswordResetToken[]
+  emailVerificationTokens EmailVerificationToken[]
+  emailChangeTokens      EmailChangeToken[]
+  auditLogs              AuditLog[]
+
+  @@index([email])
+  @@index([subscriptionTier])
+}
+
+model SearchHistory {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  city      String
+  keyword   String
+  resultCount Int
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([createdAt])
+}
+
+
+model Place {
+  id          String   @id @default(cuid())
+  googleId    String   @unique
+  name        String
+  address     String?
+  phone       String?
+  website     String?
+  rating      Float?
+  userRatingsTotal Int?
+  latitude    Float?
+  longitude   Float?
+  types       String[]
+  
+  // Scraped Data
+  emails      String[]
+  emailScores Json?    // { "email@domain.com": 85, ... } - reliability scores
+  phones      String[]
+  socials     Json?    // { facebook: string, instagram: string, linkedin: string, etc. }
+  scrapeStatus String  @default("PENDING") // PENDING, COMPLETED, FAILED, SKIPPED
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  leads       Lead[]
+}
+
+model Lead {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  placeId   String
+  place     Place    @relation(fields: [placeId], references: [id])
+  status    String   @default("NEW") // NEW, CONTACTED, CONVERTED, CLOSED
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, placeId])
+  @@index([userId])
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  userId    String
+  tokenHash String   @unique
+  expires   DateTime
+  createdAt DateTime @default(now())
+  usedAt    DateTime?
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expires])
+}
+
+model EmailVerificationToken {
+  id        String   @id @default(cuid())
+  userId    String
+  tokenHash String   @unique
+  expires   DateTime
+  createdAt DateTime @default(now())
+  usedAt    DateTime?
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expires])
+}
+
+model EmailChangeToken {
+  id        String   @id @default(cuid())
+  userId    String
+  newEmail  String
+  tokenHash String   @unique
+  expires   DateTime
+  createdAt DateTime @default(now())
+  usedAt    DateTime?
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expires])
+}
+
+model TwoFactorToken {
+  id        String   @id @default(cuid())
+  userId    String
+  tokenHash String
+  expires   DateTime
+  createdAt DateTime @default(now())
+  usedAt    DateTime?
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, tokenHash])
+  @@index([userId])
+  @@index([expires])
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  action    String
+  ip        String?
+  userAgent String?
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([action])
+  @@index([createdAt])
+}
+
+model SearchCache {
+  id        String   @id @default(cuid())
+  queryKey  String   @unique
+  results   Json
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+
+  @@index([expiresAt])
+}
+
+model CreditTransaction {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  amount      Int
+  type        String   // SEARCH, DEEP_SEARCH, PAGE_LOAD, EXPORT, API_CALL, BONUS, PURCHASE
+  description String?  // Human-readable: "Kadıköy'de kafe araması"
+  metadata    Json?    // { city: "kadıköy", keyword: "kafe", resultCount: 50 }
+  createdAt   DateTime @default(now())
+
+  @@index([userId])
+  @@index([createdAt])
+  @@index([type])
+}

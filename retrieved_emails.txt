@@ -1,0 +1,173 @@
+=== USERS ===
+prisma:query SELECT "public"."User"."id", "public"."User"."email", "public"."User"."name", "public"."User"."subscriptionTier" FROM "public"."User" WHERE 1=1 OFFSET $1
+- No Name (demo@zakrom.pro) [FREE]
+- No Name (null) [BUSINESS]
+
+=== PLACES (Collected Emails) ===
+prisma:query SELECT "public"."Place"."id", "public"."Place"."name", "public"."Place"."emails" FROM "public"."Place" WHERE "public"."Place"."emails" <> '{}' OFFSET $1
+- Mersus Bilişim Yazılım A.Ş.: Mersus-Logo-Renkli@2x.webp, Mersus-Logo-Renkli@2x-300x172.webp, Mersus-Logo-Renkli@2x-768x439.webp, anasayfa-sol-kisim-foto@3x-8.webp, anasayfa-sol-kisim-foto@3x-8-150x300.webp, anasayfa-sol-kisim-foto@3x-8-512x1024.webp, anasayfa-sol-kisim-foto@3x-8-768x1536.webp, anasayfa-sol-kisim-foto@3x-8-1024x2048.webp, anasayfa-sag-kisim-foto@3x-8-512x1024.webp, anasayfa-sag-kisim-foto@3x-8-150x300.webp, anasayfa-sag-kisim-foto@3x-8-768x1535.webp, anasayfa-sag-kisim-foto@3x-8-769x1536.webp, anasayfa-sag-kisim-foto@3x-8-1025x2048.webp, anasayfa-sag-kisim-foto@3x-8.webp, Mersus-Logo-Beyaz@2x.webp, Mersus-Logo-Beyaz@2x-300x177.webp, Mersus-Logo-Beyaz@2x-768x453.webp, info@mersus.com
+- Proaktif Yazılım Teknolojileri Ltd. Şti.: destek@proaktifteknoloji.com.tr, 605a7baede844d278b89dc95ae0a9123@sentry-next.wixpress.com, 2062d0a4929b45348643784b5cb39c36@sentry.wixpress.com
+- Canvass IT Turkey Bilgisayar Yazılım Hizmetleri Ltd. Şti.: sales@glts.mx, international@canvassit.com, turkey@canvassit.com.tr, nigeria@canvassit.com.ng
+- Online Terapi| İstanbul Online Psikolog| Levent, Sarıyer, Nişantaşı |Turkish Online therapy |Türkische Online-Therapie |: info@sisliterapi.com
+- Webbilir: info@webbilir.com
+- Wish Store - Nişantaşı: info@iyilikkazansin.com, info@wishstore.com.tr
+- Web Makinası: operasyon@webmakinasi.co
+- İstanbul Web Tasarım Ajansı - AHBilişim: azathuseyin@gmail.com, info@proactive.com, info@ahbilisim.com
+- Freelance Web Tasarım - Onur TÜRKAY: info@onurturkay.com.tr
+- Changes Digital: bg-2@2x-scaled-1.jpeg, bg-2@2x-scaled-1.jpeg.webp, info@changesdigital.com
+- ISTANBUL NETWORK YURTDIŞI ÜRÜN.PAZ.TİC.LTD.ŞTİ.: mail@istanbul-network.com
+- Highlights in Istanbul Workshops: info@highlightsinturkiye.com, example@email.com
+- Badur Boğaziçi Evleri: yonetim@badurbogazicievleri.com
+- Başlat İnternet Teknolojileri: info@baslat.com.tr
+- Web Tasarım | Arge Web: info@dewebmakers.nl
+- Webizm Interactive: temas@webizm.com
+- Divan Residence: yonetim@divanresidence.org
+- İstanbul Web Tasarım: info@istanbulwebtasarim.com.tr
+- İstanbul Dijital Pazarlama & SEO Ajansı, Web Tasarım & Yazlım, Grafik Tasarım: dsm@dijitalseomedya.com
+- Mert Web Tasarım: destek@mertwebtasarim.com
+- We İstanbul: ad@mail.com, satis@yesilyurtinsaat.com.tr, info@yesilyurtinsaat.com
+- Webliyum - Web Tasarım, SEO, Dijital Pazarlama ve Reklam Ajansı: info@webliyum.net
+- Grafilink İnternet Teknolojileri - Web Tasarım - Alan adı ve Hosting: info@grafilink.com
+- Freelance Web Tasarımcı - Ferdi Tarakcı: ferdi-tarakci@2x.webp, bilgi@ferditarakci.com
+- Coinsfera - Buy and Sell Bitcoin with cash in Istanbul , Turkey: contact@coinsfera.com
+- İstanbul SEO Ajansı - Work Medya Dijital Ajans: info@workmedya.com
+- Web Sitesi Yapan Firmalar: ajax-loader@2x.gif
+- İnternet Sitesi Kurma Web Tasarım Fiyatları | Radikal Medya: bilgi@radikalmedya.com
+- İstanbul Web Design - İstanbul Web Tasarım Ajansı: hello@maykrosoft.com, hallo@istanbulwebdesign.com
+- Wdt Ajans Mobil Ve Özel Yazılım: info@wdtajans.com
+- 360 İstanbul: 360Istanbul@360Istanbul.com
+- Smartpro Teknoloji: info@smartpro.com.tr, flags@2x.webp, globe@2x.webp, info@yuksekegitim.com
+- Web Tasarım, Web Yazılım | İstanbul Web Ajans: info@istanbulwebajans.com
+- Media Web Tasarım Reklam Ajansı: info@mizemedia.com
+- Crs Soft: info@crssoft.com, 605a7baede844d278b89dc95ae0a9123@sentry-next.wixpress.com, 88170cb0c9d64f94b5821ca7fd2d55a4@sentry-next.wixpress.com, 1eeb89147c984dc6bc3ffafd9e6cd089@sentry.wixpress.com, 79baaa8e09c746d2b7401643b99792e0@sentry.wixpress.com, 9a65e97ebe8141fca0c4fd686f70996b@sentry.wixpress.com, 2062d0a4929b45348643784b5cb39c36@sentry.wixpress.com, 8eb368c655b84e029ed79ad7a5c1718e@sentry.wixpress.com
+- ONOTIO Teknoloji: info@onotio.com
+- Codefacture A.Ş.: info@codefacture.com
+- NARCADE TEKNOLOJİ A.Ş.: user@domain.com
+- İstanbul Web Tasarım Ajansı ve Reklam Hizmetleri: info@istanbulwebtasarimajansi.com
+- Lugat İçerik Ajansı - İlk İçeriğiniz Ücretsizdir: hello@lugat.net
+- App Coding: info@appcoding.tech
+- erginyazilim: bilgi@erginyazilim.com
+- Mantis Software Company: info@mantis.com.tr
+- Master Web Tasarım Firması ve İstanbul Web Tasarım Ajansı, SEO: info@mastertasarim.com
+- Web Tasarım İstanbul: info@xdizayn.net
+- Adeks: info@adeks.net
+- HOSTAMEDIA: info@hostamedia.com
+- Bella Yazılım San. ve Tic. Ltd. Şti.: info@bellayazilim.com, destek@bellayazilim.com
+- İmza Barkod Yazılım: info@imzabarkod.com.tr, info@imzabarkod.co.uk, muhasebe@imzabarkod.com.tr
+- Çırağan Palace Kempinski: reservationoffice.ciraganpalace@kempinski.com, meetings.istanbul@kempinski.com, email@example.com, diningreservations.ciraganpalace@kempinski.com, ruya@ciraganpalace.com, reservations.corporate@kempinski.com, information.corporate@kempinski.com, info.development@kempinski.com, evamaria.panzer@kempinski.com, info.residences@kempinski.com, contact@discoveryloyalty.com
+- İstanbul Web Tasarım & Geliştirme Ajansı - Fatih | Web Sitesi yapan Firmalar: info@erdalsoft.com.tr
+- Brands&Clicks - Site Yönetimi-SEO-İçerik-Web Analiz Ajansı: info@brandsclicks.com
+- Swissôtel The Bosphorus - İstanbul: istanbul@swissotel.com, name@domain.com, johndoe@swissotels.com
+- Sigma Software: sigma.software@sigmatelecom.com, 605a7baede844d278b89dc95ae0a9123@sentry-next.wixpress.com, 18d2f96d279149989b95faf0a4b41882@sentry-next.wixpress.com, 79baaa8e09c746d2b7401643b99792e0@sentry.wixpress.com, 8eb368c655b84e029ed79ad7a5c1718e@sentry.wixpress.com, 5d1795a2db124a268f1e1bd88f503500@sentry.wixpress.com
+- Atatech Technology: info@atatech.eu
+- Mikom Yazılım Ltd.Şti.: info@mikom.com.tr, istanbul@mikom.com.tr, izmir@mikom.com.tr
+- Tpay Yazılım ve Bilişim Hizmetleri A.Ş: info@tpayyazilim.com
+- İdeanet Muhasebe Programı Logo Go Tiger Bayi Destek: info@ideanet.com.tr
+- Sürdürülebilir sistemler tasarlayan yazılım ajansı | Digitexa - Bir Yazılım Harikası: info@digitexa.com
+- Ferisoft Yazılım ve Tic. Ltd. Şti.: info@ferisoft.com
+- AY - Ata Yazılım: sales@aytld.com, name@email.com
+- MGS Software - Mobil Uygulama & Web Yazılım Firması: johnsmith@mail.com, info@mgssoftware.net
+- SNG Yazılım Ltd.Şti.: info@sng.digital
+- MyFC YAZILIM - Kadıköy - Ataşehir - Beşiktaş - İstanbul Web Tasarım: info@myfcyazilim.com, info@pushnom.com
+- Vanora Yazılım Teknolojileri AŞ: hello@vanoraventures.com
+- QTY Yazılım: info@qtyyazilim.com
+- Modern Yazılım ve Bilişim Teknolojileri San. ve Tic. Ltd. Şti.: info@modernyazilim.com
+- Omni POS Sistemleri: info@omni.com.tr
+- Patika.dev - Bootcamp: info@patika.dev
+- Ada Yazılım: ik@adayazilim.com, bilgi@adayazilim.com
+- Playable Factory: hello@playablefactory.com
+- ase Yazılım ve Bilişim Çözümleri Sanayi ve Ticaret Ltd. Şti.: ofis@aseyazilim.com.tr
+- 42 istanbul: info@42istanbul.com.tr
+- BSS YAZILIM MÜHENDİSLİK VE DANIŞMANLIK HİZMETLERİ SAN.TİC.LTD.ŞTİ.: info@bssyazilim.com.tr, contact@Iteck.co
+- Seezsoft Yazılım Danışmanlık: iletisim@seezsoft.com, info@seezsoft.com
+- INITY YAZILIM TEKNOLOJİLERİ A.Ş.: info@inity.com.tr
+- Rast mobile bilgi teknolojileri yazılım hizmetleri tic ltd Şti: contact@rastmobile.com
+- Nisan Ajans - Web Tasarım ve Yazılım Firması: info@nisanajans.com
+- Northsoft Yazılım: info@northsoft.co
+- Volant Yazılım A.Ş.: destek@volantyazilim.com.tr, sales@volantyazilim.com.tr
+- Gen Yazılım: bilgi@genyazilim.com
+- Kalem Yazılım: satis@kalemyazilim.com
+- Tais Yazılım: info@taisyazilim.com
+- FTC Yazılım Bilgisayar Reklam ve Danışmanlık Hizmetleri: info@ftcyazilim.com, destek@ftcyazilim.com
+- ML Bilgisayar Yazılım Donanım ve Danışmanlık Hizmetleri LTD ŞTİ: mlbil@mlbil.com
+- Sarman Soft Yazılım ve Teknoloji Hizmetleri Sanayi ve Ticaret Limited Şirketi: info@sarmansoft.com.tr
+- WeStudio | App Studio | Yazılım Şirketi: info@westudio.dev
+- Trios Software & Design: info@trios.com.tr
+- RNET YAZILIM HİZMETLERİ: destek@rnetyazilim.com.tr
+- CoFlow Technology ,Artificial Intelligence&ERP & PowerBI-Odoo Partner (Türkiye,Almanya,Hollanda ): hello@coflow.com.tr
+- Web Tasarım Ajansı, Yazılım Firması - MedyaCode - İstanbul: info@medyacode.com
+- Android Bilişim Hizmetleri Ltd.Şti: destek@android.com.tr
+- Hipposoft Yazılım: info@hipposoft.net
+- Core Engage: info@coreengage.com
+- Internative Yazılım A.Ş: team@internative.net, support@internative.net
+- AMP YAZILIM GENEL MÜDÜRLÜĞÜ: iletisim@amp.com.tr
+- Seksen Yirmi Yazılım: selam@seksenyirmi.com, info@seksenyirmi.com
+- MTSOFT Yazılım ve Danışmanlık Hizmetleri: info@mtsoft.com.tr
+- Softtech: info@softtech.com.tr
+- ARN FINTECH YAZILIM LİMİTED ŞİRKETİ: info@arnfintech.com, support@arnfintech.com
+- Applosoft Yazılım & Dijital Hizmetleri: info@applosoft.com.tr
+- Odeon Creative Web Tasarım ve Dijital Pazarlama Ajansı: info@odeoncreative.com
+- Webliyon Web Tasarım - Web Yazılım -E-Ticaret Yazılımları: bilgi@webliyon.com, destek@webliyon.com
+- Infotech Academy Yazılım Kursu (Kadıköy Şube): info@infotechacademy.com.tr
+- ikas: destek@ikas.com, ikas@hs02.kep.tr, u003edestek@ikas.com
+- TurnaSoft Bilgi Teknolojileri: info@turnasoft.com
+- Mizan yazılım: info@mizanyazilim.com
+- ASAY YAZILIM DANIŞMANLIK: info@asaydanismanlik.com
+- RIDEV SOFTWARE SYSTEMS: info@ridev.com.tr
+- Web Tasarım, Yazılım Firması - Zomotech - Gebze: istanbul@zomotech.com
+- Madlen Teknoloji: hello@madlen.io
+- BeeCorp Teknoloji Yazılım Danışmanlık: oguzhan.karanfil@gmail.com
+- ATP Yazılım ve Teknoloji: info@atptech.com
+- Üçgen Yazılım Danışmanlık Bilgisayar ve Makine San. Tic. Ltd. Şti.: bilgi@ucgenyazilim.com
+- Ovidax Yazılım İstanbul: hello@ovidax.com
+- İSİMTESCİL BİLİŞİM ANONİM ŞİRKETİ: email@example.com, destek@isimtescil.net, abuse@isimtescil.net
+- IND Yazılım Bilişim Teknolojileri Sanayi ve Ticaret A.Ş.: info@indbilisim.com.tr
+- Ritmus - Salesforce Authorized Reseller: info@ritmus.com, 605a7baede844d278b89dc95ae0a9123@sentry-next.wixpress.com, ed436f5053144538958ad06a5005e99a@sentry.wixpress.com, 460ff4620fa44cba8df530afde949785@sentry.wixpress.com, 79baaa8e09c746d2b7401643b99792e0@sentry.wixpress.com, 2062d0a4929b45348643784b5cb39c36@sentry.wixpress.com, 8eb368c655b84e029ed79ad7a5c1718e@sentry.wixpress.com, 271e9fa3230b4eec94b02bf95780f5f2@sentry.wixpress.com
+- Softwate Bilişim | Gittizon | EticaretYap: bilgi@eticaretyap.com
+- ELMER YAZILIM DAN. VE. TİC. LTD. ŞTİ.: elmer@elmer.com.tr
+- Worklab Yazılım Şirketi: info@worklab.com.tr
+- ACW İstanbul Reklam Ajansı: acw@acwistanbul.com
+- Softtech Tuzla Şube: info@softtech.com.tr
+- Quandoo Turkey: service.tr@quandoo.com, u002Fd32ad5863cfa4416b0c07e6f4c0242d4@sentry.io
+- Beşiktaş Sanal Ofis Online: sales@sanalofisonline.com
+- Media Web Tasarım Reklam Ajansı: info@mizemedia.com
+- Symbola Bosphorus Istanbul: operation@symbolabosphorus.com, info@symbolabosphorus.com
+- MediaClick Web Tasarım & Yazılım Firması ️: bilgi@mediaclick.com.tr
+- Dodo Bilişim Yazılım Ve İnternet Hizmetleri: info@dodobilisim.net
+- Teknolojipos: 605a7baede844d278b89dc95ae0a9123@sentry-next.wixpress.com, dd0a55ccb8124b9c9d938e3acf41f8aa@sentry.wixpress.com, c183baa23371454f99f417f6616b724d@sentry.wixpress.com, 8c4075d5481d476e945486754f783364@sentry.io, ed436f5053144538958ad06a5005e99a@sentry.wixpress.com, 460ff4620fa44cba8df530afde949785@sentry.wixpress.com, 9a65e97ebe8141fca0c4fd686f70996b@sentry.wixpress.com, 1eeb89147c984dc6bc3ffafd9e6cd089@sentry.wixpress.com, 54b4aac306184111a223c0f4aea635c3@sentry.wixpress.com, 98b21aa53d68482b8414e892d9af0e5f@sentry-next.wixpress.com, 2062d0a4929b45348643784b5cb39c36@sentry.wixpress.com, 8eb368c655b84e029ed79ad7a5c1718e@sentry.wixpress.com, 271e9fa3230b4eec94b02bf95780f5f2@sentry.wixpress.com
+- Inmanage: name@email.com
+- OFFICE ISTANBUL Hazır Ofis ve Sanal Ofis Merkezi: bilgi@officeistanbul.com.tr
+- İNKSEN Teknoloji ve Danışmanlık A.Ş: tech@inksen.com
+- Path | Product & Software House: info@path.com.tr
+- Quantumix Bilişim Yazılım ve Bilgi İşlem Danışmanlık Ticaret Limited Şirketi: info@quantumix.com.tr
+- Soft Marketing - Mobil Uygulama Geliştirme, Kurumsal Web Tasarım ve Yazılım Danışmanlığı: info@softmarketing.net
+- E İMZA OFİSİ I ATAŞEHİR I e-İmza I e-Fatura I KEP: info@eimzaofisi.com.tr
+- Pomelo Soft Yazılım Kurumsal Web Tasarım Ajansı Yazılım Firması: info@pomelosoft.com
+- Vizyoneks Bilgi Teknolojileri A.Ş.: info@vizyoneks.com.tr, 605a7baede844d278b89dc95ae0a9123@sentry-next.wixpress.com, dd0a55ccb8124b9c9d938e3acf41f8aa@sentry.wixpress.com, c183baa23371454f99f417f6616b724d@sentry.wixpress.com, 8c4075d5481d476e945486754f783364@sentry.io, 460ff4620fa44cba8df530afde949785@sentry.wixpress.com, ed436f5053144538958ad06a5005e99a@sentry.wixpress.com, 88170cb0c9d64f94b5821ca7fd2d55a4@sentry-next.wixpress.com, 9a65e97ebe8141fca0c4fd686f70996b@sentry.wixpress.com, 2062d0a4929b45348643784b5cb39c36@sentry.wixpress.com, 271e9fa3230b4eec94b02bf95780f5f2@sentry.wixpress.com
+- ATAŞEHİR BİLİŞİM – Bilgisayar Bakım Anlaşması, Kurumsal IT Hizmeti | Teramind Türkiye Distribütörü: info@atasehirbilisim.com
+- Beyaz Yazılım: bilgi@beyazyazilim.com
+- Lena Software: tnw-logo@2x.svg, award-shape@2x.svg, wired-logo@2x.svg, getir-logo@2x.svg, info@lenasoftware.com, in-tw-icon@2x.svg, in-icon@2x.svg, closeIcon@2x.svg
+- Pharma Soft İlaç Bilişim Danışmanlık: admin@gmail.com, business@pharmasoft.com.tr, u003Ebusiness@pharmasoft.com.tr, info@pharmasoft.com.tr, pda@pharmasoft.com.tr, atelier@pharmasoft.com.tr
+- Golive Yazılım Hizmetleri: info@golive.com.tr, software@olmadikprojeler.com
+- Black Fit Adana: 605a7baede844d278b89dc95ae0a9123@sentry-next.wixpress.com, 8c4075d5481d476e945486754f783364@sentry.io, dd0a55ccb8124b9c9d938e3acf41f8aa@sentry.wixpress.com, c183baa23371454f99f417f6616b724d@sentry.wixpress.com, 9a65e97ebe8141fca0c4fd686f70996b@sentry.wixpress.com, 18d2f96d279149989b95faf0a4b41882@sentry-next.wixpress.com, 79baaa8e09c746d2b7401643b99792e0@sentry.wixpress.com, 78f7996315bc402f9dcb8a2f974b82d1@sentry.wixpress.com, 8eb368c655b84e029ed79ad7a5c1718e@sentry.wixpress.com, e0b4d631da7b4200828051f7f9c783e3@sentry-next.wixpress.com, 5d1795a2db124a268f1e1bd88f503500@sentry.wixpress.com, 0fd2930120484402ac9adfb9e05cacd5@o37417.ingest.sentry.io, ornek@sitem.com
+- Nokta Bilgisayar: info@aksaraynokta.com, servis@aksaraynokta.com
+- Ümit Aksoy Aksaray Online Mağazacılık: 605a7baede844d278b89dc95ae0a9123@sentry-next.wixpress.com, cd64ba1f47df485bba2b0076c0dd3b25@sentry.wixpress.com, c098db2425c540d3982e073ae7fc4c9a@sentry.wixpress.com, 8c4075d5481d476e945486754f783364@sentry.io, 9a65e97ebe8141fca0c4fd686f70996b@sentry.wixpress.com, 79baaa8e09c746d2b7401643b99792e0@sentry.wixpress.com, ed436f5053144538958ad06a5005e99a@sentry.wixpress.com, 460ff4620fa44cba8df530afde949785@sentry.wixpress.com, 2062d0a4929b45348643784b5cb39c36@sentry.wixpress.com, 8eb368c655b84e029ed79ad7a5c1718e@sentry.wixpress.com, a18507e8883842d8a1ba47257fee81ac@sentry.wixpress.com, 271e9fa3230b4eec94b02bf95780f5f2@sentry.wixpress.com
+- NES YAZILIM Merkez/AKSARAY: info@nesdrive.com
+- Ajans AltıSekiz: brandon@loggo.com, bilgi@68.com.tr
+- Evids Teknoloji: contact@evidsgroup.com
+- POYRAZ TASARIM TEKNOLOJİ ve BİLİŞİM HİZMETLERİ: poyraztasarim@hotmail.com, support@yoursite.com
+- Enpro Yazılım / Web Tasarım / Özel Yazılım: info@enproyazilim.com
+- acb İleri Teknoloji, Bilişim ve Görsel İletişim, e-Dönüşüm e-Ticaret Dijital Dönüşüm, Reklam Grafik Marka Tasarım, KEP e-İmza: bilgi@acb.web.tr, BILGI@ACB.COM.TR, bilgi@acb.com.tr
+- Zümrüt Reklam Ajansı: info@ajanszumrut.com
+- KURBİL BİLİŞİM: basret@kurbil.com.tr, contact@example.com
+- e-İmza KEP Başvuru Merkezi | Elektronik imza e imza, Kayıtlı e-Posta, e Arşiv, e Fatura, e Devlet, e Dönüşüm Hizmetleri: bilgi@ahmetmedya.com.tr
+- AHMET MEDYA Bilişim ve Medya Hizmetleri; Aksaray Web Tasarım ve İnternet Sosyal Medya ve Görsel İletişim e-Ticaret e-Dönüşüm: ahmetmedya@ahmetmedya.com, bilgi@ahmetmedya.com, medya@ahmetmedya.com
+- Fikir Nook Yazılım ve Danışmanlık: fikirnook@gmail.com, info@fikirnook.com
+- FALKE: info@falke-bt.com
+- PAŞABEYZADE Bilgi Teknolojileri ve Görsel İletişim Hizmetleri Topluluğu: ahmetmedya@ahmetmedya.com, bilgi@pasabeyzade.com.tr
+- Revelation Performance Aksaray: revelationperformancetr@gmail.com
+- Ucuz Yazılım | Web Sitesi, Özel Yazılım, Sosyal Medya Yönetim, Danışmanlık: bilgi@ucuzyazilim.com, info@ucuzyazilim.com
+
+Total Users: 2
+Total Places with Emails: 162
+Total Emails Found in Places: 320
