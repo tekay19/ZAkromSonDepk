@@ -1,19 +1,24 @@
 @import "tailwindcss";
 
 :root {
-  /* Premium Dark Mode Palette */
-  --background: #000000;
-  --foreground: #ffffff;
+  /* Premium Glamorous Palette */
+  --background: #030303;
+  --foreground: #f8fafc;
 
-  --primary: #3b82f6;
+  --primary: #6366f1;
+  /* Indigo */
   --primary-foreground: #ffffff;
 
-  --muted: #0a0a0a;
-  --muted-foreground: #888888;
+  --accent: #a855f7;
+  /* Purple */
+  --accent-foreground: #ffffff;
 
-  --border: #1a1a1a;
-  --card: #050505;
-  --card-foreground: #ffffff;
+  --muted: #0f172a;
+  --muted-foreground: #94a3b8;
+
+  --border: #1e293b;
+  --card: rgba(15, 23, 42, 0.4);
+  --card-foreground: #f8fafc;
 
   /* Spacing */
   --spacing-section: clamp(80px, 15vh, 160px);
@@ -25,6 +30,8 @@
   --color-foreground: var(--foreground);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
   --color-border: var(--border);
@@ -38,13 +45,14 @@
   /* Section Titles */
   --text-h2: clamp(2rem, 4vw, 3.5rem);
   --text-h3: clamp(1.5rem, 3vw, 2.5rem);
-  --text-body: clamp(1rem, 1.2vw, 1.25rem);
+  --text-body: clamp(1rem, 1.2vw, 1.15rem);
 }
 
 body {
   background-color: var(--background);
   color: var(--foreground);
-  font-family: var(--font-inter), sans-serif;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  letter-spacing: -0.01em;
   overflow-x: hidden;
 }
 

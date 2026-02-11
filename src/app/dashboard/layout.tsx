@@ -1,10 +1,10 @@
 
-
 "use client";
 
 import { Sidebar } from "@/components/Sidebar";
 import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function DashboardLayout({
     children,
@@ -35,24 +35,35 @@ export default function DashboardLayout({
     };
 
     return (
-        <div className="flex h-screen bg-[#0a0a0a] text-white overflow-hidden font-sans">
-            {/* Sidebar */}
-            <aside
-                className={cn(
-                    "hidden md:block border-r border-white/5 bg-black/40 backdrop-blur-xl transition-[width] duration-200",
-                    collapsed ? "w-[72px]" : "w-64"
-                )}
+        <div className="flex h-screen bg-[#030303] text-white overflow-hidden font-sans selection:bg-primary/30 selection:text-white">
+            {/* Ambient Background Glows */}
+            <div className="fixed inset-0 pointer-events-none -z-10 bg-[radial-gradient(circle_at_20%_20%,rgba(99,102,241,0.05)_0,transparent_50%)]" />
+            <div className="fixed inset-0 pointer-events-none -z-10 bg-[radial-gradient(circle_at_80%_80%,rgba(168,85,247,0.05)_0,transparent_50%)]" />
+
+            {/* Sidebar Container */}
+            <motion.aside
+                initial={false}
+                animate={{ width: collapsed ? 100 : 256 }}
+                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                className="hidden md:block h-full border-r border-white/10 bg-black/40 backdrop-blur-3xl z-40"
             >
                 <Sidebar collapsed={collapsed} onToggleCollapsed={toggleCollapsed} />
-            </aside>
+            </motion.aside>
 
-            {/* Main Content */}
-            <main className="flex-1 overflow-y-auto relative">
-                {/* Background Glow */}
-                <div className="absolute top-0 left-0 w-full h-96 bg-primary/5 rounded-full blur-3xl -z-10 translate-y-[-50%] pointer-events-none" />
+            {/* Main Content Area */}
+            <main className="flex-1 h-full overflow-hidden relative flex flex-col">
+                <div className="flex-1 overflow-y-auto px-6 py-10 md:px-12 md:py-16 scroll-smooth scrollbar-hide">
+                    {/* Page Header Accent Glow */}
+                    <div className="absolute top-0 left-1/4 w-1/2 h-64 bg-primary/10 rounded-full blur-[120px] -z-10 pointer-events-none transform -translate-y-1/2" />
 
-                <div className="p-6 md:p-8 w-full space-y-8">
-                    {children}
+                    <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5, delay: 0.1 }}
+                        className="max-w-[1600px] mx-auto w-full"
+                    >
+                        {children}
+                    </motion.div>
                 </div>
             </main>
         </div>
