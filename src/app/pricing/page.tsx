@@ -1,7 +1,7 @@
 "use client";
 
 import { SUBSCRIPTION_PLANS, CREDIT_COSTS, CREDIT_COSTS_BY_TIER } from "@/lib/constants/pricing";
-import { CheckCircle2, Zap, Download } from "lucide-react";
+import { CheckCircle2, Zap } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 

@@ -4,6 +4,7 @@ import { auth } from "@/auth";
 import { addExportJob } from "@/lib/queue/export-queue";
 import { PLANS, SubscriptionTier } from "@/lib/plans";
 import { prisma } from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
 import { logAuditEvent } from "@/lib/auth/audit";
 import { getRequestMeta } from "@/lib/auth/request-meta";
 
@@ -71,7 +72,7 @@ export async function startExport(args: {
         );
     }
 
-    await prisma.$transaction(async (tx: any) => {
+    await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
         const updated = await tx.user.updateMany({
             where: { id: userId, credits: { gte: totalCost } },
             data: { credits: { decrement: totalCost } },

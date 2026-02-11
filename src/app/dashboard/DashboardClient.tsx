@@ -159,8 +159,8 @@ export default function DashboardClient() {
         } else {
           setError("Arama geçmişi yüklenemedi.");
         }
-      } catch (e: any) {
-        if (!cancelled) setError(e?.message || "Arama geçmişi yüklenemedi.");
+      } catch (error: unknown) {
+        if (!cancelled) setError(error instanceof Error ? error.message : "Arama geçmişi yüklenemedi.");
       } finally {
         if (!cancelled) setLoadingHistoryResults(false);
       }
@@ -301,9 +301,9 @@ export default function DashboardClient() {
         setSearching(false);
         await refreshAll();
       }
-    } catch (e: any) {
+    } catch (error: unknown) {
       setSearching(false);
-      setError(e?.message || "Arama başarısız.");
+      setError(error instanceof Error ? error.message : "Arama başarısız.");
       await refreshAll().catch(() => { });
     }
   };
@@ -317,8 +317,8 @@ export default function DashboardClient() {
       setResults((cur) => mergePlaces(cur, res.data || []));
       setNextPageToken(res.nextPageToken);
       await refreshAll();
-    } catch (e: any) {
-      setError(e?.message || "Sayfa yüklenemedi.");
+    } catch (error: unknown) {
+      setError(error instanceof Error ? error.message : "Sayfa yüklenemedi.");
     } finally {
       setLoadingMore(false);
     }
@@ -327,13 +327,13 @@ export default function DashboardClient() {
   const handleUnlock = async (placeIds: string[]) => {
     setError(null);
     try {
-      const res = await unlockEmails(placeIds);
+      await unlockEmails(placeIds);
       setResults((cur) => mergePlaces(cur, placeIds.map((id) => ({ place_id: id, emailUnlocked: true }))));
       await refreshAll();
       const enriched = await getEnrichedPlaces(placeIds);
       setResults((cur) => mergePlaces(cur, enriched as any));
-    } catch (e: any) {
-      setError(e?.message || "Mail kilidi açılamadı.");
+    } catch (error: unknown) {
+      setError(error instanceof Error ? error.message : "Mail kilidi açılamadı.");
     }
   };
 
@@ -346,8 +346,8 @@ export default function DashboardClient() {
       setExportJobId(res.jobId);
       setExportStatus("pending");
       await refreshAll();
-    } catch (e: any) {
-      setError(e?.message || "Export başlatılamadı.");
+    } catch (error: unknown) {
+      setError(error instanceof Error ? error.message : "Export başlatılamadı.");
     }
   };
 
@@ -744,11 +744,11 @@ export default function DashboardClient() {
           {nextPageToken ? "DERİN TARAMA VERİLERİYLE DEVAM ET" : "BU ARAMA İÇİN TÜM VERİLER KESFEDİLDİ"}
         </div>
       </div>
-    <PlaceDetailModal
-      isOpen={detailOpen}
-      onClose={() => setDetailOpen(false)}
-      place={selectedPlace}
-    />
+      <PlaceDetailModal
+        isOpen={detailOpen}
+        onClose={() => setDetailOpen(false)}
+        place={selectedPlace}
+      />
     </div>
   );
 }

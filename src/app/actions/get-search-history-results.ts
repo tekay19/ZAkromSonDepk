@@ -5,8 +5,15 @@ import { prisma } from "@/lib/prisma";
 import { auth } from "@/auth";
 import { maskEmail } from "@/lib/masking";
 import { buildGlobalSearchCacheKey, normalizeSearchInput } from "@/lib/search/cache-key";
+import { PlaceResult } from "@/lib/types";
 
-async function ensureLeadsForUser(userId: string, places: any[]) {
+interface SearchResults {
+    places: PlaceResult[];
+    nextPageToken?: string;
+    [key: string]: any;
+}
+
+async function ensureLeadsForUser(userId: string, places: PlaceResult[]) {
     if (!userId) return;
     if (!Array.isArray(places) || places.length === 0) return;
 
@@ -29,7 +36,7 @@ async function ensureLeadsForUser(userId: string, places: any[]) {
  * Cache'den önceki arama sonuçlarını getirir.
  * Kredi DÜŞMEZ - sadece mevcut cache okunur.
  */
-async function hydratePlacesForUser(userId: string, places: any[]) {
+async function hydratePlacesForUser(userId: string, places: PlaceResult[]) {
     if (!userId) return places;
     if (!Array.isArray(places) || places.length === 0) return places;
 
@@ -60,7 +67,7 @@ async function hydratePlacesForUser(userId: string, places: any[]) {
     const freshMap = new Map(freshPlaces.map((p) => [p.googleId, p]));
     const unlockedSet = new Set(leads.filter((l) => l.emailUnlocked).map((l) => l.place.googleId));
 
-    return places.map((p: any) => {
+    return places.map((p) => {
         const id = p?.place_id;
         if (!id) return p;
 
@@ -69,17 +76,17 @@ async function hydratePlacesForUser(userId: string, places: any[]) {
         const freshEmails = fresh?.emails || [];
         const emailCount = Array.isArray(freshEmails) ? freshEmails.length : 0;
 
-        const out: any = { ...p };
+        const out: PlaceResult = { ...p };
 
         out.emailUnlocked = emailUnlocked;
         out.emailCount = emailCount;
         out.emails = emailUnlocked ? freshEmails : [];
         out.maskedEmails = !emailUnlocked && emailCount > 0 ? freshEmails.slice(0, 1).map(maskEmail) : [];
-        out.emailScores = emailUnlocked ? (fresh?.emailScores || {}) : {};
+        out.emailScores = emailUnlocked ? ((fresh?.emailScores as unknown as Record<string, number>) || {}) : {};
 
         if (fresh) {
             out.phones = Array.isArray(fresh.phones) ? fresh.phones : out.phones;
-            out.socials = fresh.socials ?? out.socials;
+            out.socials = (fresh.socials as unknown as PlaceResult["socials"]) ?? out.socials;
             out.website = fresh.website || out.website;
             out.scrapeStatus = fresh.scrapeStatus || out.scrapeStatus;
         }
@@ -158,7 +165,7 @@ export async function getSearchHistoryResults(historyId: string) {
             console.log(`[GetHistoryResults] Found in DB: ${cacheKey}, Expired: ${isExpired}`);
 
             if (!isExpired) {
-                const parsed = dbCache.results as any;
+                const parsed = dbCache.results as unknown as SearchResults;
                 parsed.places = await hydratePlacesForUser(userId, parsed.places || []);
 
                 // Refresh Redis cache
