@@ -178,6 +178,7 @@ const worker = new Worker(EXPORT_QUEUE_NAME, async (job: Job) => {
             const base64 = (buffer as any).toString("base64");
             await redis.set(`export:${jobId}:result`, base64, "EX", 3600);
             await redis.set(`export:${jobId}:status`, "completed", "EX", 3600);
+            console.log(`[ExportWorker] XLSX export completed for job ${jobId}`);
         } else if (format === "csv") {
             // CSV Logic simplified
             const header = "İşletme Adı,Adres,Telefon,Web Sitesi,E-postalar,Bulunan Telefonlar,Instagram,Facebook,LinkedIn,Puan,Yorum Sayısı,Kategori\n";
@@ -195,8 +196,9 @@ const worker = new Worker(EXPORT_QUEUE_NAME, async (job: Job) => {
                 return `"${(p.name || "").replace(/\"/g, "\"\"")}","${(p.address || "-").replace(/\"/g, "\"\"")}","${(p.phone || "-").replace(/\"/g, "\"\"")}","${(p.website || "-").replace(/\"/g, "\"\"")}","${emails.replace(/\"/g, "\"\"")}","${phones.replace(/\"/g, "\"\"")}","${socialInsta.replace(/\"/g, "\"\"")}","${socialFb.replace(/\"/g, "\"\"")}","${socialLi.replace(/\"/g, "\"\"")}","${p.rating ?? "-"}","${p.userRatingsTotal ?? 0}","${(p.types?.[0] || "-").replace(/\"/g, "\"\"")}"`;
             }).join("\n");
 
-            await redis.set(`export:${jobId}:result`, header + rows, "EX", 3600);
+            await redis.set(`export:${jobId}:result`, "\ufeff" + header + rows, "EX", 3600);
             await redis.set(`export:${jobId}:status`, "completed", "EX", 3600);
+            console.log(`[ExportWorker] CSV export completed for job ${jobId}`);
         } else {
             // JSON
             const payload = ordered.map((l) => {
@@ -222,6 +224,7 @@ const worker = new Worker(EXPORT_QUEUE_NAME, async (job: Job) => {
 
             await redis.set(`export:${jobId}:result`, JSON.stringify(payload, null, 2), "EX", 3600);
             await redis.set(`export:${jobId}:status`, "completed", "EX", 3600);
+            console.log(`[ExportWorker] JSON export completed for job ${jobId}`);
         }
     } catch (err: any) {
         console.error("Export failed", err);

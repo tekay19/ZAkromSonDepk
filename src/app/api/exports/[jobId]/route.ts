@@ -21,9 +21,11 @@ export async function GET(
     try {
         const owner = await redis.get(`export:${jobId}:userId`);
         if (owner && owner !== session.user.id) {
+            console.warn(`[ExportAPI] Owner mismatch for job ${jobId}. Owner: ${owner}, Requester: ${session.user.id}`);
             return NextResponse.json({ error: "Forbidden" }, { status: 403 });
         }
         if (!owner && process.env.NODE_ENV === "production") {
+            console.warn(`[ExportAPI] No owner found for job ${jobId} in production.`);
             return NextResponse.json({ error: "Export job not found" }, { status: 404 });
         }
 
@@ -35,39 +37,42 @@ export async function GET(
         ]);
 
         if (!status) {
+            console.warn(`[ExportAPI] Status missing for job ${jobId}`);
             return NextResponse.json({ error: 'Export job not found' }, { status: 404 });
         }
 
-    if (isDownload && status === 'completed' && result) {
+        if (isDownload && status === 'completed' && result) {
             const resolvedFormat = (format === "xlsx" || format === "csv" || format === "json")
                 ? format
                 : (jobId.includes('xlsx') ? 'xlsx' : jobId.includes('json') ? 'json' : 'csv');
+
+            const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+            const filename = `zakrom_export_${timestamp}.${resolvedFormat}`;
 
             if (resolvedFormat === 'xlsx') {
                 const buffer = Buffer.from(result, 'base64');
                 return new NextResponse(buffer, {
                     headers: {
                         'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                        'Content-Disposition': `attachment; filename="zakrom_export_${Date.now()}.xlsx"`,
+                        'Content-Disposition': `attachment; filename="${filename}"`,
                     },
                 });
             } else if (resolvedFormat === "json") {
                 return new NextResponse(result, {
                     headers: {
                         "Content-Type": "application/json; charset=utf-8",
-                        "Content-Disposition": `attachment; filename="zakrom_export_${Date.now()}.json"`,
+                        "Content-Disposition": `attachment; filename="${filename}"`,
                     },
                 });
             } else {
                 return new NextResponse(result, {
                     headers: {
-                        'Content-Type': 'text/csv',
-                        'Content-Disposition': `attachment; filename="zakrom_export_${Date.now()}.csv"`,
+                        'Content-Type': 'text/csv; charset=utf-8',
+                        'Content-Disposition': `attachment; filename="${filename}"`,
                     },
                 });
             }
         }
-
         return NextResponse.json({
             jobId,
             status,

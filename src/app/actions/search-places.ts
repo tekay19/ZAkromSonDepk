@@ -729,7 +729,7 @@ export async function executeSearchCore(city: string, keyword: string, userId: s
 
         return finalResult;
     }
-        // B. Handle New Search (Standard or Deep)
+    // B. Handle New Search (Standard or Deep)
     else if (!initialPageToken) {
         let allPlaces: any[] = [];
 
@@ -746,127 +746,127 @@ export async function executeSearchCore(city: string, keyword: string, userId: s
             if (allPlaces.length > 0) {
                 // No need to call Google again; proceed to slicing/persisting below.
             } else {
-            // 1. Get Viewport (using a cheap TextSearch for city)
-            const cityResult = await googlePlacesGateway.searchText(city, {
-                pageSize: 5,
-                billing: { userId, tier },
-            });
-
-            // Prefer localities (cities) over broader administrative areas or countries
-            const preferredTypes = ['locality', 'administrative_area_level_3', 'administrative_area_level_2', 'administrative_area_level_1'];
-            let cityPlace = cityResult.places.find((p: any) =>
-                p.types?.some((t: string) => preferredTypes.includes(t))
-            ) || cityResult.places[0];
-
-            console.log(`[Deep Search] Viewport check for "${city}":`, {
-                hasPlace: !!cityPlace,
-                hasViewport: !!cityPlace?.viewport,
-                placeTypes: cityPlace?.types,
-                placeName: cityPlace?.displayName?.text || cityPlace?.name
-            });
-
-            const cityViewport = cityPlace?.viewport ? {
-                northeast: {
-                    lat: Number((cityPlace.viewport as any).northeast?.latitude || (cityPlace.viewport as any).high?.latitude || 0),
-                    lng: Number((cityPlace.viewport as any).northeast?.longitude || (cityPlace.viewport as any).high?.longitude || 0)
-                },
-                southwest: {
-                    lat: Number((cityPlace.viewport as any).southwest?.latitude || (cityPlace.viewport as any).low?.latitude || 0),
-                    lng: Number((cityPlace.viewport as any).southwest?.longitude || (cityPlace.viewport as any).low?.longitude || 0)
-                }
-            } : null;
-
-            if (!cityViewport || (cityViewport.northeast.lat === 0 && cityViewport.northeast.lng === 0)) {
-                console.log("Deep Search fallback: No viewport found for city.");
-                const result = await googlePlacesGateway.searchText(`${keyword} in ${city}`, {
+                // 1. Get Viewport (using a cheap TextSearch for city)
+                const cityResult = await googlePlacesGateway.searchText(city, {
+                    pageSize: 5,
                     billing: { userId, tier },
                 });
-                allPlaces = result.places;
-                // Persist & Publish Fallback Batch
-                const persistedBatch = await persistAndPublish(allPlaces);
-                enrichedPlaces.push(...persistedBatch);
-            } else {
-                // Optional "hybrid" mode via explicit prefix, but default deep search uses API only.
-                if (keyword.startsWith("scrape:")) {
-                    try {
-                        const cleanKeyword = keyword.replace("scrape:", "").trim();
-                        console.log(`[Search] HYBRID MODE: Scraping for "${cleanKeyword}" in ${city}...`);
-                        const { scraperGateway } = await import('@/lib/gateway/scraper-gateway');
-                        const scrapedPlaces = await scraperGateway.scanRegion(`${cleanKeyword} in ${city}`, cityViewport);
 
-                        if (scrapedPlaces.length > 0) {
-                            allPlaces = scrapedPlaces.map(p => ({
-                                place_id: p.googleId || `scrape:${shortHash(p.name + p.latitude)}`,
-                                name: p.name,
-                                formatted_address: p.address,
-                                rating: p.rating,
-                                user_ratings_total: p.userRatingsTotal,
-                                formatted_phone_number: p.phone,
-                                website: p.website,
-                                photos: [],
-                                icon: p.imgUrl,
-                                geometry: { location: { lat: p.latitude, lng: p.longitude } },
-                                location: { latitude: p.latitude, longitude: p.longitude },
-                                types: p.types
-                            }));
+                // Prefer localities (cities) over broader administrative areas or countries
+                const preferredTypes = ['locality', 'administrative_area_level_3', 'administrative_area_level_2', 'administrative_area_level_1'];
+                let cityPlace = cityResult.places.find((p: any) =>
+                    p.types?.some((t: string) => preferredTypes.includes(t))
+                ) || cityResult.places[0];
 
-                            const persistedBatch = await persistAndPublish(allPlaces);
-                            enrichedPlaces.push(...persistedBatch);
+                console.log(`[Deep Search] Viewport check for "${city}":`, {
+                    hasPlace: !!cityPlace,
+                    hasViewport: !!cityPlace?.viewport,
+                    placeTypes: cityPlace?.types,
+                    placeName: cityPlace?.displayName?.text || cityPlace?.name
+                });
+
+                const cityViewport = cityPlace?.viewport ? {
+                    northeast: {
+                        lat: Number((cityPlace.viewport as any).northeast?.latitude || (cityPlace.viewport as any).high?.latitude || 0),
+                        lng: Number((cityPlace.viewport as any).northeast?.longitude || (cityPlace.viewport as any).high?.longitude || 0)
+                    },
+                    southwest: {
+                        lat: Number((cityPlace.viewport as any).southwest?.latitude || (cityPlace.viewport as any).low?.latitude || 0),
+                        lng: Number((cityPlace.viewport as any).southwest?.longitude || (cityPlace.viewport as any).low?.longitude || 0)
+                    }
+                } : null;
+
+                if (!cityViewport || (cityViewport.northeast.lat === 0 && cityViewport.northeast.lng === 0)) {
+                    console.log("Deep Search fallback: No viewport found for city.");
+                    const result = await googlePlacesGateway.searchText(`${keyword} in ${city}`, {
+                        billing: { userId, tier },
+                    });
+                    allPlaces = result.places;
+                    // Persist & Publish Fallback Batch
+                    const persistedBatch = await persistAndPublish(allPlaces);
+                    enrichedPlaces.push(...persistedBatch);
+                } else {
+                    // Optional "hybrid" mode via explicit prefix, but default deep search uses API only.
+                    if (keyword.startsWith("scrape:")) {
+                        try {
+                            const cleanKeyword = keyword.replace("scrape:", "").trim();
+                            console.log(`[Search] HYBRID MODE: Scraping for "${cleanKeyword}" in ${city}...`);
+                            const { scraperGateway } = await import('@/lib/gateway/scraper-gateway');
+                            const scrapedPlaces = await scraperGateway.scanRegion(`${cleanKeyword} in ${city}`, cityViewport);
+
+                            if (scrapedPlaces.length > 0) {
+                                allPlaces = scrapedPlaces.map(p => ({
+                                    place_id: p.googleId || `scrape:${shortHash(p.name + p.latitude)}`,
+                                    name: p.name,
+                                    formatted_address: p.address,
+                                    rating: p.rating,
+                                    user_ratings_total: p.userRatingsTotal,
+                                    formatted_phone_number: p.phone,
+                                    website: p.website,
+                                    photos: [],
+                                    icon: p.imgUrl,
+                                    geometry: { location: { lat: p.latitude, lng: p.longitude } },
+                                    location: { latitude: p.latitude, longitude: p.longitude },
+                                    types: p.types
+                                }));
+
+                                const persistedBatch = await persistAndPublish(allPlaces);
+                                enrichedPlaces.push(...persistedBatch);
+                            }
+                        } catch (e) {
+                            console.error("[Search] Scraper failed, falling back to API:", e);
                         }
-                    } catch (e) {
-                        console.error("[Search] Scraper failed, falling back to API:", e);
+                    }
+
+                    // API deep search should be incremental: do not pre-scan the whole city.
+                    if (allPlaces.length === 0) {
+                        // Budgeted Google API calls for the initial deep scan.
+                        // Keep aligned with unit economics (see KARLILIK_ANALIZI.md).
+                        const deepInitialApiBudgetByTier: Record<SubscriptionTier, number> = {
+                            FREE: 8,
+                            STARTER: 10,
+                            PRO: 15,
+                            BUSINESS: 20,
+                        };
+
+                        // Prefill multiple pages up-front to keep "Load more" cheap (cache-only).
+                        // This avoids re-triggering external API calls on every pagination click.
+                        const prefillPagesByTier: Record<SubscriptionTier, number> = {
+                            FREE: 1,
+                            STARTER: 2,
+                            PRO: 3,
+                            BUSINESS: 5,
+                        };
+                        const prefillMaxResultsRaw = Number(process.env.DEEP_SEARCH_PREFILL_MAX_RESULTS || 300);
+                        const prefillMaxResults = Math.max(DEEP_PAGE_SIZE, Math.min(3000, prefillMaxResultsRaw));
+                        const prefillTargetCount = Math.min(
+                            prefillMaxResults,
+                            DEEP_PAGE_SIZE * (prefillPagesByTier[tier] || 1)
+                        );
+
+                        await fillDeepCacheToTarget({
+                            normalizedCity,
+                            normalizedKeyword,
+                            keyword,
+                            cityViewport,
+                            billingUserId: userId,
+                            billingTier: tier,
+                            baseGridSize: gridSize,
+                            maxPagesPerGrid,
+                            maxDepth,
+                            pageSize: DEEP_PAGE_SIZE,
+                            listCacheKey,
+                            listDataCacheKey,
+                            ttlSeconds: LONG_TERM_TTL,
+                            targetCount: prefillTargetCount,
+                            apiCallBudget: deepInitialApiBudgetByTier[tier] || 16,
+                        });
+
+                        const raw = await redis.get(listDataCacheKey);
+                        const parsed = safeJsonParse<any>(raw);
+                        allPlaces = Array.isArray(parsed) ? parsed : (parsed?.places || []);
                     }
                 }
-
-                // API deep search should be incremental: do not pre-scan the whole city.
-                if (allPlaces.length === 0) {
-                    // Budgeted Google API calls for the initial deep scan.
-                    // Keep aligned with unit economics (see KARLILIK_ANALIZI.md).
-                    const deepInitialApiBudgetByTier: Record<SubscriptionTier, number> = {
-                        FREE: 8,
-                        STARTER: 10,
-                        PRO: 15,
-                        BUSINESS: 20,
-                    };
-
-                    // Prefill multiple pages up-front to keep "Load more" cheap (cache-only).
-                    // This avoids re-triggering external API calls on every pagination click.
-                    const prefillPagesByTier: Record<SubscriptionTier, number> = {
-                        FREE: 1,
-                        STARTER: 2,
-                        PRO: 3,
-                        BUSINESS: 5,
-                    };
-                    const prefillMaxResultsRaw = Number(process.env.DEEP_SEARCH_PREFILL_MAX_RESULTS || 300);
-                    const prefillMaxResults = Math.max(DEEP_PAGE_SIZE, Math.min(3000, prefillMaxResultsRaw));
-                    const prefillTargetCount = Math.min(
-                        prefillMaxResults,
-                        DEEP_PAGE_SIZE * (prefillPagesByTier[tier] || 1)
-                    );
-
-                    await fillDeepCacheToTarget({
-                        normalizedCity,
-                        normalizedKeyword,
-                        keyword,
-                        cityViewport,
-                        billingUserId: userId,
-                        billingTier: tier,
-                        baseGridSize: gridSize,
-                        maxPagesPerGrid,
-                        maxDepth,
-                        pageSize: DEEP_PAGE_SIZE,
-                        listCacheKey,
-                        listDataCacheKey,
-                        ttlSeconds: LONG_TERM_TTL,
-                        targetCount: prefillTargetCount,
-                        apiCallBudget: deepInitialApiBudgetByTier[tier] || 16,
-                    });
-
-                    const raw = await redis.get(listDataCacheKey);
-                    const parsed = safeJsonParse<any>(raw);
-                    allPlaces = Array.isArray(parsed) ? parsed : (parsed?.places || []);
-                }
-            }
             }
 
             // Limit for First Page Return
@@ -1071,23 +1071,27 @@ export async function searchPlacesInternal(
     });
     const lockKey = `lock:${cacheKey}`;
 
-    // 1) Redis cache
+    // 1) Redis cache (Global)
     const cachedResults = await redis.get(cacheKey);
     if (cachedResults) {
         const parsed = stripJobId(JSON.parse(cachedResults)) as any;
         parsed.places = await hydratePlacesForUser(effectiveUserId, parsed.places || []);
-        const { ip, userAgent } = await getRequestMeta();
-        await logAuditEvent({
-            userId: effectiveUserId,
-            action: "SEARCH_CACHE_HIT",
-            ip,
-            userAgent,
-            metadata: { city: normalizedCity, keyword: normalizedKeyword, deepSearch, hasPageToken: Boolean(initialPageToken) },
-        });
+        console.log(`[Search] Global Redis Cache Hit: ${cacheKey}`);
         return parsed;
     }
 
-    // 2) DB cache (fallback)
+    // 2) Legacy Redis cache (User-specific fallback)
+    const mode = deepSearch || initialPageToken?.startsWith("deep:") ? "deep" : "std";
+    const legacyKey = `search:${effectiveUserId}:${normalizedCity}:${normalizedKeyword}:${mode}:${initialPageToken || "p1"}`;
+    const legacyCached = await redis.get(legacyKey);
+    if (legacyCached) {
+        const parsed = stripJobId(JSON.parse(legacyCached)) as any;
+        parsed.places = await hydratePlacesForUser(effectiveUserId, parsed.places || []);
+        console.log(`[Search] Legacy Redis Cache Hit: ${legacyKey}`);
+        return parsed;
+    }
+
+    // 3) DB cache (Global fallback)
     const dbCache = await prisma.searchCache.findUnique({
         where: { queryKey: cacheKey }
     });
@@ -1098,14 +1102,19 @@ export async function searchPlacesInternal(
         await redis.set(cacheKey, JSON.stringify(safe), "EX", ttlSeconds);
         const parsed = safe as any;
         parsed.places = await hydratePlacesForUser(effectiveUserId, parsed.places || []);
-        const { ip, userAgent } = await getRequestMeta();
-        await logAuditEvent({
-            userId: effectiveUserId,
-            action: "SEARCH_CACHE_HIT_DB",
-            ip,
-            userAgent,
-            metadata: { city: normalizedCity, keyword: normalizedKeyword, deepSearch, hasPageToken: Boolean(initialPageToken) },
-        });
+        console.log(`[Search] Global DB Cache Hit: ${cacheKey}`);
+        return parsed;
+    }
+
+    // 4) DB cache (Legacy fallback)
+    const legacyDbCache = await prisma.searchCache.findUnique({
+        where: { queryKey: legacyKey }
+    });
+    if (legacyDbCache && legacyDbCache.expiresAt > new Date()) {
+        const safe = stripJobId(legacyDbCache.results as any);
+        const parsed = safe as any;
+        parsed.places = await hydratePlacesForUser(effectiveUserId, parsed.places || []);
+        console.log(`[Search] Legacy DB Cache Hit: ${legacyKey}`);
         return parsed;
     }
 

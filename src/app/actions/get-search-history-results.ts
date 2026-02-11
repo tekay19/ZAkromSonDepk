@@ -4,10 +4,7 @@ import { redis } from "@/lib/redis";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/auth";
 import { maskEmail } from "@/lib/masking";
-
-function normalizeInput(value: string) {
-    return value.trim().toLowerCase();
-}
+import { buildGlobalSearchCacheKey, normalizeSearchInput } from "@/lib/search/cache-key";
 
 async function ensureLeadsForUser(userId: string, places: any[]) {
     if (!userId) return;
@@ -111,23 +108,34 @@ export async function getSearchHistoryResults(historyId: string) {
         throw new Error("Bu aramaya erişim yetkiniz yok.");
     }
 
-    // 2. Build cache key (same logic as search-places.ts)
-    const normalizedCity = normalizeInput(history.city);
-    const normalizedKeyword = normalizeInput(history.keyword);
+    // 2. Build candidate cache keys
+    const normalizedCity = normalizeSearchInput(history.city);
+    const normalizedKeyword = normalizeSearchInput(history.keyword);
 
-    // Search history does not store whether the query was deep or std.
-    // Try both cache namespaces (deep first, then std) and return whichever exists.
+    console.log(`[GetHistoryResults] ID: ${historyId}, User: ${userId}`);
+    console.log(`[GetHistoryResults] Query: ${normalizedKeyword} in ${normalizedCity}`);
+
+    // Try both deep and std modes, global and legacy user-specific keys
     const candidates = [
-        { mode: "deep" as const, isDeep: true },
-        { mode: "std" as const, isDeep: false },
+        buildGlobalSearchCacheKey({ normalizedCity, normalizedKeyword, deepSearch: true }),
+        buildGlobalSearchCacheKey({ normalizedCity, normalizedKeyword, deepSearch: false }),
+        // Fallback for older global keys
+        `search:global:${normalizedCity}:${normalizedKeyword}:deep:p1`,
+        `search:global:${normalizedCity}:${normalizedKeyword}:std:p1`,
+        // Fallback for legacy user-specific keys
+        `search:${userId}:${normalizedCity}:${normalizedKeyword}:deep:p1`,
+        `search:${userId}:${normalizedCity}:${normalizedKeyword}:std:p1`,
     ];
 
-    for (const c of candidates) {
-        const cacheKey = `search:global:${normalizedCity}:${normalizedKeyword}:${c.mode}:p1`;
+    const uniqueCandidates = Array.from(new Set(candidates));
+
+    for (const cacheKey of uniqueCandidates) {
+        console.log(`[GetHistoryResults] Checking key: ${cacheKey}`);
 
         // 3. Try Redis cache first
         const cachedResults = await redis.get(cacheKey);
         if (cachedResults) {
+            console.log(`[GetHistoryResults] Found in Redis: ${cacheKey}`);
             const parsed = JSON.parse(cachedResults);
             parsed.places = await hydratePlacesForUser(userId, parsed.places || []);
             return {
@@ -135,7 +143,7 @@ export async function getSearchHistoryResults(historyId: string) {
                 fromCache: true,
                 city: history.city,
                 keyword: history.keyword,
-                isDeep: c.isDeep,
+                isDeep: cacheKey.includes(":deep:"),
                 results: parsed,
             };
         }
@@ -145,24 +153,30 @@ export async function getSearchHistoryResults(historyId: string) {
             where: { queryKey: cacheKey },
         });
 
-        if (dbCache && dbCache.expiresAt > new Date()) {
-            const parsed = dbCache.results as any;
-            parsed.places = await hydratePlacesForUser(userId, parsed.places || []);
+        if (dbCache) {
+            const isExpired = dbCache.expiresAt <= new Date();
+            console.log(`[GetHistoryResults] Found in DB: ${cacheKey}, Expired: ${isExpired}`);
 
-            // Refresh Redis cache
-            const ttlSeconds = Math.max(1, Math.floor((dbCache.expiresAt.getTime() - Date.now()) / 1000));
-            await redis.set(cacheKey, JSON.stringify(dbCache.results), "EX", ttlSeconds);
+            if (!isExpired) {
+                const parsed = dbCache.results as any;
+                parsed.places = await hydratePlacesForUser(userId, parsed.places || []);
 
-            return {
-                success: true,
-                fromCache: true,
-                city: history.city,
-                keyword: history.keyword,
-                isDeep: c.isDeep,
-                results: parsed,
-            };
+                // Refresh Redis cache
+                const ttlSeconds = Math.max(1, Math.floor((dbCache.expiresAt.getTime() - Date.now()) / 1000));
+                await redis.set(cacheKey, JSON.stringify(dbCache.results), "EX", ttlSeconds);
+
+                return {
+                    success: true,
+                    fromCache: true,
+                    city: history.city,
+                    keyword: history.keyword,
+                    isDeep: cacheKey.includes(":deep:"),
+                    results: parsed,
+                };
+            }
         }
     }
+    console.warn(`[GetHistoryResults] No valid cache found for ${historyId}`);
 
     // 5. Cache expired / not found - need to re-search
     return {

@@ -658,7 +658,13 @@ export default function DashboardClient() {
                   <div className="mt-3 text-[11px] text-white/50">
                     Export job: <span className="font-mono">{exportJobId}</span> ({exportStatus})
                     {exportStatus === "completed" ? (
-                      <a className="ml-2 text-primary hover:underline" href={`/api/exports/${exportJobId}?download=true`}>
+                      <a
+                        className="ml-2 text-primary hover:underline font-bold"
+                        href={`/api/exports/${exportJobId}?download=true`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        download
+                      >
                         indir
                       </a>
                     ) : null}

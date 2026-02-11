@@ -227,8 +227,11 @@ export default function LeadsPage() {
               Export: <span className="font-mono">{exportJobId}</span> ({exportStatus})
               {exportStatus === "completed" ? (
                 <a
-                  className="ml-2 text-primary hover:underline"
+                  className="ml-2 text-primary hover:underline font-bold"
                   href={`/api/exports/${exportJobId}?download=true`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  download
                 >
                   indir
                 </a>
