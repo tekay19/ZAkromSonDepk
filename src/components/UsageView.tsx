@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { getCreditHistory, getCreditSummary, CreditHistoryItem } from "@/app/actions/get-credit-history";
-import { Coins, Search, Zap, FileSpreadsheet, ArrowDownCircle, ArrowUpCircle, Calendar, TrendingDown, Clock, Activity, Loader2 } from "lucide-react";
+import { Coins, Search, Zap, FileSpreadsheet, ArrowDownCircle, ArrowUpCircle, Calendar, TrendingDown, Clock, Activity, Loader2, Mail } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { PLANS, SubscriptionTier } from "@/lib/plans";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
@@ -16,8 +16,11 @@ const TYPE_ICONS: Record<string, any> = {
     DEEP_SEARCH: Zap,
     PAGE_LOAD: ArrowDownCircle,
     EXPORT: FileSpreadsheet,
+    EMAIL_UNLOCK: Mail,
+    VISUAL_EXPORT: Activity,
     BONUS: ArrowUpCircle,
     PURCHASE: Coins,
+    SUBSCRIPTION_RENEWAL: ArrowUpCircle,
     API_CALL: Activity
 };
 
@@ -26,8 +29,11 @@ const TYPE_LABELS: Record<string, string> = {
     DEEP_SEARCH: "Derin Arama",
     PAGE_LOAD: "Sayfa Yükle",
     EXPORT: "Dışa Aktar",
+    EMAIL_UNLOCK: "Mail Kilidi",
+    VISUAL_EXPORT: "Harita Export",
     BONUS: "Bonus",
     PURCHASE: "Satın Alma",
+    SUBSCRIPTION_RENEWAL: "Aylık Yükleme",
     API_CALL: "API Çağrısı"
 };
 
@@ -36,8 +42,11 @@ const TYPE_COLORS: Record<string, string> = {
     DEEP_SEARCH: "#8b5cf6",
     PAGE_LOAD: "#06b6d4",
     EXPORT: "#10b981",
+    EMAIL_UNLOCK: "#22c55e",
+    VISUAL_EXPORT: "#eab308",
     BONUS: "#22c55e",
     PURCHASE: "#f59e0b",
+    SUBSCRIPTION_RENEWAL: "#34d399",
     API_CALL: "#ef4444"
 };
 

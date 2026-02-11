@@ -13,9 +13,17 @@ const PRICE_IDS: Record<SubscriptionTier, string> = {
 };
 
 export async function createCheckoutSession(tier: SubscriptionTier) {
+    // Mock mode — skip Stripe entirely
+    if (process.env.NEXT_PUBLIC_ENABLE_STRIPE_MOCK === "true") {
+        return { url: `/checkout/mock?tier=${tier}` };
+    }
+
     const session = await auth();
-    const userId = session?.user?.id || "default-user";
-    const userEmail = session?.user?.email || "demo@example.com";
+    if (!session?.user?.id || !session.user.email) {
+        throw new Error("Ödeme başlatmak için giriş yapmanız gerekiyor.");
+    }
+    const userId = session.user.id;
+    const userEmail = session.user.email;
 
     const user = await prisma.user.findUnique({ where: { id: userId } });
     if (!user) throw new Error("User not found");
@@ -29,8 +37,8 @@ export async function createCheckoutSession(tier: SubscriptionTier) {
         customer_email: user.stripeCustomerId ? undefined : userEmail,
         line_items: [{ price: priceId, quantity: 1 }],
         mode: "subscription",
-        success_url: `${process.env.NEXTAUTH_URL}/dashboard?success=true`,
-        cancel_url: `${process.env.NEXTAUTH_URL}/dashboard?canceled=true`,
+        success_url: `${process.env.NEXTAUTH_URL}/dashboard/settings?success=true`,
+        cancel_url: `${process.env.NEXTAUTH_URL}/dashboard/settings?canceled=true`,
         metadata: { userId, tier },
     });
 

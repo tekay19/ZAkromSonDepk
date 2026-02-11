@@ -5,6 +5,11 @@ import { getStripe } from "@/lib/stripe";
 import { prisma } from "@/lib/prisma";
 
 export async function createCustomerPortalSession() {
+    // Mock mode — just redirect back to settings
+    if (process.env.NEXT_PUBLIC_ENABLE_STRIPE_MOCK === "true") {
+        return { url: "/dashboard/settings" };
+    }
+
     const session = await auth();
     if (!session?.user?.id) {
         return { error: "Yetkisiz erişim. Lütfen giriş yapın." };
@@ -22,7 +27,7 @@ export async function createCustomerPortalSession() {
         const stripe = getStripe();
         const portalSession = await stripe.billingPortal.sessions.create({
             customer: user.stripeCustomerId,
-            return_url: `${process.env.NEXTAUTH_URL}/dashboard`,
+            return_url: `${process.env.NEXTAUTH_URL}/dashboard/settings`,
         });
 
         return { url: portalSession.url };

@@ -1,5 +1,5 @@
-import { prisma } from "./src/lib/prisma";
-import { hashPassword } from "./src/lib/auth/password";
+import { prisma } from "@/lib/prisma";
+import { hashPassword } from "@/lib/auth/password";
 
 async function createAdminUser() {
     const email = "tekaysemih5@gmail.com";

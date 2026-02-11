@@ -1,18 +1,21 @@
 "use server";
 
+import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
-import { PlaceResult } from "@/components/ResultsTable";
+import { PlaceResult } from "@/lib/types";
+import { maskEmail } from "@/lib/masking";
 
-export async function getLeads(userId: string): Promise<PlaceResult[]> {
+export async function getLeads(limit: number = 100): Promise<PlaceResult[]> {
+    const session = await auth();
+    if (!session?.user?.id) {
+        throw new Error("Oturum açmanız gerekiyor.");
+    }
+    const userId = session.user.id;
+
     try {
         const leads = await prisma.lead.findMany({
             where: {
-                userId: userId,
-                place: {
-                    emails: {
-                        isEmpty: false
-                    }
-                }
+                userId,
             },
             include: {
                 place: true
@@ -20,12 +23,15 @@ export async function getLeads(userId: string): Promise<PlaceResult[]> {
             orderBy: {
                 updatedAt: 'desc'
             },
-            take: 100 // Limit for now to avoid massive payloads
+            take: Math.min(Math.max(1, limit), 500) // Keep payload bounded
         });
 
         // Map to PlaceResult interface
         return leads.map(lead => {
             const p = lead.place;
+            const emailUnlocked = Boolean(lead.emailUnlocked);
+            const emails = Array.isArray(p.emails) ? p.emails : [];
+            const emailCount = emails.length;
             return {
                 place_id: p.googleId,
                 name: p.name,
@@ -39,7 +45,11 @@ export async function getLeads(userId: string): Promise<PlaceResult[]> {
                     latitude: p.latitude,
                     longitude: p.longitude
                 } : undefined,
-                emails: p.emails,
+                emails: emailUnlocked ? emails : [],
+                maskedEmails: !emailUnlocked && emailCount > 0 ? emails.slice(0, 1).map(maskEmail) : [],
+                emailCount,
+                emailUnlocked,
+                scrapeStatus: (p as any).scrapeStatus,
                 socials: p.socials as any || undefined, // Typesafe casting if needed
                 // We might not have photos or extensive details stored in Place yet, 
                 // or we rely on them being optional in PlaceResult

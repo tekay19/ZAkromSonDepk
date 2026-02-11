@@ -1,4 +1,4 @@
-import { PlaceResult } from "@/components/ResultsTable";
+import { PlaceResult } from "@/lib/types";
 
 export interface StrategyReport {
     opportunityScore: {
@@ -129,13 +129,20 @@ export function generateMarketStrategy(results: PlaceResult[]): StrategyReport {
     const dominants = results.filter(p => (p.user_ratings_total || 0) > 1000).length;
     if (dominants > 0) threats.push(`${dominants} adet pazar lideri (1000+ yorum) var. Pazar payı almak zor olabilir.`);
 
-    // 5. Action Plan
+    // 5. Action Plan & Market Persona
     const actionPlan: StrategyReport["actionPlan"] = [];
+
+    // Determine Market Persona
+    let marketPersona = "Dengeli Pazar";
+    if (competitionScore > 80 && demandScore > 80) marketPersona = "Savaş Alanı (Yüksek Rekabet/Talep)";
+    else if (competitionScore < 30 && demandScore > 60) marketPersona = "Gizli Cevher (Düşük Rekabet/Yüksek Talep)";
+    else if (demandScore < 30) marketPersona = "Durgun Pazar";
+    else if (digitalGapScore > 70) marketPersona = "Dijital Çöl (İnternet Varlığı Yok)";
 
     // Plan A: Digital Transformation (If gap is high)
     if (digitalGapScore > 50) {
         actionPlan.push({
-            title: "Dijital Dönüşüm Paketi Satışı",
+            title: "Dijital Dönüşüm Paketi",
             priority: "HIGH",
             steps: [
                 `Web sitesi olmayan ${total - withWebsite} işletmeyi hedefle.`,
@@ -146,14 +153,14 @@ export function generateMarketStrategy(results: PlaceResult[]): StrategyReport {
     }
 
     // Plan B: Reputation Rescue (If ratings explain opportunity)
-    if (opportunityScore > 60 && lowRated > 0) {
+    if (lowRated > 0 && (demandScore > 40 || avgReviews > 20)) {
         actionPlan.push({
-            title: "Yorum ve İtibar Yönetimi",
+            title: "İtibar Kurtarma Operasyonu",
             priority: "HIGH",
             steps: [
-                "3.8 puan altındaki işletmelere 'Puanınızı Yükseltin' teklifi sun.",
-                "QR menü ve otomatik yorum sitemleri öner.",
-                "Negatif yorumları yönetme eğitimi ver."
+                `${lowRated} adet düşük puanlı (<3.8) ancak aktif işletme tespit edildi.`,
+                "Negatif yorumları silme/yönetme danışmanlığı ver.",
+                "Otomatik yorum toplama sistemi (QR Menü) sat."
             ]
         });
     }
@@ -197,7 +204,7 @@ export function generateMarketStrategy(results: PlaceResult[]): StrategyReport {
         saturation: {
             score: Math.round(competitionScore),
             level: saturationLevel,
-            description: saturationLevel === "LOW" ? "Düşük Rekabet" : saturationLevel === "MODERATE" ? "Dengeli" : "Yüksek Rekabet"
+            description: marketPersona
         },
         digitalMaturity: {
             score: Math.round(digitalScore),

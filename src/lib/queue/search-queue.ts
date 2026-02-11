@@ -1,23 +1,48 @@
-import { Queue } from 'bullmq';
-import { redisConnection } from './config';
-import '@/lib/worker/search-worker'; // Ensure worker starts
 
-const QUEUE_NAME = 'search-jobs';
+import { Queue } from "bullmq";
+import { randomUUID } from "crypto";
+import { redisConnection } from "./config";
 
-export const searchQueue = new Queue(QUEUE_NAME, {
-    connection: redisConnection,
-    defaultJobOptions: {
-        attempts: 3,
-        backoff: {
-            type: 'exponential',
-            delay: 1000,
+export const SEARCH_QUEUE_NAME = "search-queue";
+
+function createSearchQueue() {
+    return new Queue(SEARCH_QUEUE_NAME, {
+        connection: redisConnection,
+        defaultJobOptions: {
+            attempts: 3,
+            backoff: {
+                type: "exponential",
+                delay: 1000,
+            },
+            removeOnComplete: { count: 100 }, // Keep last 100 completed jobs
+            removeOnFail: { count: 50 }, // Keep last 50 failed jobs
         },
-        removeOnComplete: true,
-        removeOnFail: false,
-    },
-});
+    });
+}
 
-export async function addSearchJob(data: { city: string; keyword: string; userId: string; initialPageToken?: string; deepSearch?: boolean }) {
-    const job = await searchQueue.add('search-task', data);
-    return job.id;
+const globalForQueues = global as unknown as { searchQueue?: Queue };
+
+export function getSearchQueue() {
+    if (!globalForQueues.searchQueue) {
+        globalForQueues.searchQueue = createSearchQueue();
+    }
+    return globalForQueues.searchQueue;
+}
+
+export interface SearchJobData {
+    userId: string;
+    city: string;
+    keyword: string;
+    deepSearch: boolean;
+    initialPageToken?: string;
+}
+
+export async function addSearchJob(data: SearchJobData) {
+    // Use an unguessable job id because it is exposed to the client for polling.
+    // Deduplication is handled by API-level locks.
+    const jobId = randomUUID();
+
+    await getSearchQueue().add("search-task", data, { jobId });
+
+    return jobId;
 }

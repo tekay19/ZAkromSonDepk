@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { APIProvider, Map, useMap, useMapsLibrary } from "@vis.gl/react-google-maps";
-import { PlaceResult } from "./ResultsTable";
+import { PlaceResult } from "@/lib/types";
 
 interface AnalyticsMapProps {
     results: PlaceResult[];
@@ -106,8 +106,23 @@ function HeatmapLayer({ results }: { results: PlaceResult[] }) {
         const newHeatmap = new visualization.HeatmapLayer({
             data: data,
             map: map,
-            radius: 30,
+            radius: 50, // Larger radius for better visibility
             opacity: 0.8,
+            dissipating: true,
+            maxIntensity: 10,
+            gradient: [
+                "rgba(0, 0, 0, 0)",        // Transparent
+                "rgba(102, 51, 153, 0.4)", // Deep Purple (low density)
+                "rgba(138, 43, 226, 0.6)", // Blue Violet
+                "rgba(75, 0, 130, 0.7)",   // Indigo
+                "rgba(0, 191, 255, 0.8)",  // Deep Sky Blue
+                "rgba(0, 255, 255, 0.85)", // Cyan
+                "rgba(127, 255, 0, 0.9)",  // Chartreuse
+                "rgba(255, 255, 0, 0.92)", // Yellow
+                "rgba(255, 165, 0, 0.95)", // Orange
+                "rgba(255, 69, 0, 0.97)",  // Red-Orange
+                "rgba(255, 0, 0, 1)"       // Red (high density)
+            ]
         });
 
         setHeatmap(newHeatmap);

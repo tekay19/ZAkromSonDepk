@@ -1,37 +1,57 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import { auth } from "@/auth";
+import { maskEmail } from "@/lib/masking";
 
 export async function getEnrichedPlaces(placeIds: string[]) {
     if (!placeIds || placeIds.length === 0) {
         return [];
     }
 
+    const session = await auth();
+    if (!session?.user?.id) {
+        throw new Error("Oturum açmanız gerekiyor.");
+    }
+    const userId = session.user.id;
+
     // Limit to prevent abuse
     const limitedIds = placeIds.slice(0, 200);
 
-    const places = await prisma.place.findMany({
-        where: {
-            googleId: { in: limitedIds }
-        },
+    const leads = await prisma.lead.findMany({
+        where: { userId, place: { googleId: { in: limitedIds } } },
         select: {
-            googleId: true,
-            emails: true,
-            emailScores: true,
-            phones: true,
-            socials: true,
-            website: true,
-            scrapeStatus: true
-        }
+            emailUnlocked: true,
+            place: {
+                select: {
+                    googleId: true,
+                    emails: true,
+                    emailScores: true,
+                    phones: true,
+                    socials: true,
+                    website: true,
+                    scrapeStatus: true,
+                },
+            },
+        },
     });
 
-    return places.map(p => ({
-        place_id: p.googleId,
-        emails: p.emails || [],
-        emailScores: p.emailScores || {},
-        phones: p.phones || [],
-        socials: p.socials || {},
-        website: p.website,
-        scrapeStatus: p.scrapeStatus
-    }));
+    return leads.map((l) => {
+        const p = l.place;
+        const emailUnlocked = Boolean(l.emailUnlocked);
+        const emailCount = Array.isArray(p.emails) ? p.emails.length : 0;
+
+        return {
+            place_id: p.googleId,
+            emailUnlocked,
+            emailCount,
+            emails: emailUnlocked ? (p.emails || []) : [],
+            maskedEmails: !emailUnlocked && emailCount > 0 ? (p.emails || []).slice(0, 1).map(maskEmail) : [],
+            emailScores: emailUnlocked ? (p.emailScores || {}) : {},
+            phones: p.phones || [],
+            socials: p.socials || {},
+            website: p.website,
+            scrapeStatus: p.scrapeStatus,
+        };
+    });
 }

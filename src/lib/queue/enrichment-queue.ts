@@ -1,7 +1,6 @@
 
 import { Queue } from 'bullmq';
 import { redisConnection } from './config';
-import '@/lib/worker/enrichment-worker'; // Ensure worker starts
 
 const QUEUE_NAME = 'enrichment-jobs';
 

@@ -1,6 +1,7 @@
 
 import { redis } from '@/lib/redis';
 import { NextRequest } from 'next/server';
+import { auth } from "@/auth";
 
 export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams;
@@ -8,6 +9,19 @@ export async function GET(request: NextRequest) {
 
     if (!jobId) {
         return new Response('Job ID is required', { status: 400 });
+    }
+
+    const session = await auth();
+    if (!session?.user?.id) {
+        return new Response("Unauthorized", { status: 401 });
+    }
+    const owner = await redis.get(`job:${jobId}:userId`);
+    if (owner && owner !== session.user.id) {
+        return new Response("Forbidden", { status: 403 });
+    }
+    // If the owner key is missing, be strict in production.
+    if (!owner && process.env.NODE_ENV === "production") {
+        return new Response("Not found", { status: 404 });
     }
 
     const encoder = new TextEncoder();

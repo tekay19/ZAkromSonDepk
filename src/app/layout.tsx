@@ -5,19 +5,18 @@ import { cn } from "@/lib/utils";
 import { Providers } from "@/components/providers";
 import { initWorkers } from "@/lib/worker-init";
 
-if (typeof window === "undefined") {
-  initWorkers();
-}
-
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
-const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit" });
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
+const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit", display: "swap" });
 
 export const metadata: Metadata = {
   title: "Zakrom - Marketing Leads",
   description: "Find high-quality B2B leads globally.",
 };
 
-export const runtime = "nodejs";
+// Initialize worker only on server side
+if (typeof window === "undefined") {
+  initWorkers();
+}
 
 export default function RootLayout({
   children,
@@ -25,20 +24,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning>
       <body
-        suppressHydrationWarning
         className={cn(
           inter.variable,
           outfit.variable,
-          "min-h-screen bg-background font-sans antialiased selection:bg-primary/20 text-foreground"
+          "min-h-screen bg-background font-sans antialiased text-foreground"
         )}
       >
-        <div className="relative flex min-h-screen flex-col">
-          <Providers>
-            <main className="flex-1">{children}</main>
-          </Providers>
-        </div>
+        <Providers>
+          {children}
+        </Providers>
       </body>
     </html>
   );

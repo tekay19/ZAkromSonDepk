@@ -7,9 +7,9 @@ import { Country, State, City, type ICountry, type IState, type ICity } from 'co
 import { CONTINENTS, COUNTRY_CONTINENT_MAP } from "@/lib/continents";
 
 interface SearchFormProps {
-    onSearch: (city: string, keyword: string, deepSearch?: boolean) => void;
+    onSearch: (city: string, keyword: string) => void;
     isLoading: boolean;
-    defaultDeepSearch?: boolean;
+    showRecentSearches?: boolean;
 }
 
 interface SearchHistoryItem {
@@ -23,14 +23,12 @@ interface SearchHistoryItem {
     cityName?: string;
 }
 
-export function SearchForm({ onSearch, isLoading, defaultDeepSearch }: SearchFormProps) {
+export function SearchForm({ onSearch, isLoading, showRecentSearches = false }: SearchFormProps) {
     const [selectedContinent, setSelectedContinent] = useState("");
     const [selectedCountryCode, setSelectedCountryCode] = useState("");
     const [selectedStateCode, setSelectedStateCode] = useState("");
     const [selectedCityName, setSelectedCityName] = useState("");
     const [keyword, setKeyword] = useState("");
-    const [isDeepSearch, setIsDeepSearch] = useState(defaultDeepSearch ?? false);
-    const [deepSearchManuallySet, setDeepSearchManuallySet] = useState(false);
 
     const [history, setHistory] = useState<SearchHistoryItem[]>([]);
 
@@ -44,12 +42,6 @@ export function SearchForm({ onSearch, isLoading, defaultDeepSearch }: SearchFor
             }
         }
     }, []);
-
-    useEffect(() => {
-        if (!deepSearchManuallySet && typeof defaultDeepSearch === "boolean") {
-            setIsDeepSearch(defaultDeepSearch);
-        }
-    }, [defaultDeepSearch, deepSearchManuallySet]);
 
     const countries = useMemo<ICountry[]>(() => {
         let all = Country.getAllCountries();
@@ -117,7 +109,7 @@ export function SearchForm({ onSearch, isLoading, defaultDeepSearch }: SearchFor
                 displayLocation = `${actualCountry?.name}`;
             }
 
-            onSearch(location, keyword, isDeepSearch);
+            onSearch(location, keyword);
             saveToHistory(displayLocation, keyword);
         }
     };
@@ -144,17 +136,16 @@ export function SearchForm({ onSearch, isLoading, defaultDeepSearch }: SearchFor
         else if (item.stateCode) location = `${state?.name}, ${country?.name}`;
         else location = `${country?.name}`;
 
-        onSearch(location, item.keyword, isDeepSearch);
+        onSearch(location, item.keyword);
     };
 
     return (
-        <div className="w-full max-w-5xl mx-auto space-y-4">
+        <div className="w-full max-w-6xl mx-auto space-y-3">
             <form onSubmit={handleSubmit} className="relative z-10">
-                <div className="glass-card p-3 rounded-2xl flex flex-col md:flex-row items-center gap-3 flex-wrap">
+                <div className="glass-card p-3 rounded-2xl flex flex-col md:flex-row md:items-end gap-3 flex-wrap">
 
                     {/* Continent Dropdown */}
                     <div className="relative w-full md:w-auto min-w-[120px]">
-                        <label className="text-xs text-muted-foreground ml-3 mb-1 block">Kıta</label>
                         <select
                             value={selectedContinent}
                             onChange={(e) => {
@@ -163,7 +154,8 @@ export function SearchForm({ onSearch, isLoading, defaultDeepSearch }: SearchFor
                                 setSelectedStateCode("");
                                 setSelectedCityName("");
                             }}
-                            className="w-full bg-white/5 border border-white/10 text-foreground focus:ring-1 focus:ring-primary h-12 rounded-xl outline-none px-3 appearance-none"
+                            aria-label="Kıta"
+                            className="w-full bg-white/5 border border-white/10 text-foreground focus:ring-1 focus:ring-primary h-10 rounded-xl outline-none px-3 appearance-none"
                         >
                             <option value="" className="bg-neutral-900">Tümü</option>
                             {CONTINENTS.map(c => (
@@ -176,7 +168,6 @@ export function SearchForm({ onSearch, isLoading, defaultDeepSearch }: SearchFor
 
                     {/* Country Dropdown */}
                     <div className="relative flex-1 w-full min-w-[150px]">
-                        <label className="text-xs text-muted-foreground ml-3 mb-1 block">Ülke</label>
                         <select
                             value={selectedCountryCode}
                             onChange={(e) => {
@@ -184,7 +175,8 @@ export function SearchForm({ onSearch, isLoading, defaultDeepSearch }: SearchFor
                                 setSelectedStateCode("");
                                 setSelectedCityName("");
                             }}
-                            className="w-full bg-white/5 border border-white/10 text-foreground focus:ring-1 focus:ring-primary h-12 rounded-xl outline-none px-3 appearance-none"
+                            aria-label="Ülke"
+                            className="w-full bg-white/5 border border-white/10 text-foreground focus:ring-1 focus:ring-primary h-10 rounded-xl outline-none px-3 appearance-none"
                             required
                         >
                             <option value="" className="bg-neutral-900">Ülke Seç</option>
@@ -198,14 +190,14 @@ export function SearchForm({ onSearch, isLoading, defaultDeepSearch }: SearchFor
 
                     {/* State Dropdown (Province/Region) */}
                     <div className="relative flex-1 w-full min-w-[150px]">
-                        <label className="text-xs text-muted-foreground ml-3 mb-1 block">Bölge / Şehir</label>
                         <select
                             value={selectedStateCode}
                             onChange={(e) => {
                                 setSelectedStateCode(e.target.value);
                                 setSelectedCityName("");
                             }}
-                            className="w-full bg-white/5 border border-white/10 text-foreground focus:ring-1 focus:ring-primary h-12 rounded-xl outline-none px-3 appearance-none"
+                            aria-label="Bölge / Şehir"
+                            className="w-full bg-white/5 border border-white/10 text-foreground focus:ring-1 focus:ring-primary h-10 rounded-xl outline-none px-3 appearance-none"
                             disabled={!selectedCountryCode || states.length === 0}
                         >
                             <option value="" className="bg-neutral-900">Bölge Seç</option>
@@ -219,11 +211,11 @@ export function SearchForm({ onSearch, isLoading, defaultDeepSearch }: SearchFor
 
                     {/* City Dropdown (District/Locality) */}
                     <div className="relative flex-1 w-full min-w-[150px]">
-                        <label className="text-xs text-muted-foreground ml-3 mb-1 block">İlçe / Semt</label>
                         <select
                             value={selectedCityName}
                             onChange={(e) => setSelectedCityName(e.target.value)}
-                            className="w-full bg-white/5 border border-white/10 text-foreground focus:ring-1 focus:ring-primary h-12 rounded-xl outline-none px-3 appearance-none"
+                            aria-label="İlçe / Semt"
+                            className="w-full bg-white/5 border border-white/10 text-foreground focus:ring-1 focus:ring-primary h-10 rounded-xl outline-none px-3 appearance-none"
                             disabled={!selectedStateCode || cities.length === 0}
                         >
                             <option value="" className="bg-neutral-900">İlçe Seç</option>
@@ -235,69 +227,42 @@ export function SearchForm({ onSearch, isLoading, defaultDeepSearch }: SearchFor
                         </select>
                     </div>
 
-                    <div className="w-px h-12 bg-white/10 hidden md:block self-center" />
+                    <div className="w-px h-10 bg-white/10 hidden md:block self-center" />
 
-                    <label className="text-xs text-muted-foreground ml-3 mb-1 block">Anahtar Kelime</label>
-                    <div className="relative">
+                    <div className="relative flex-1 w-full min-w-[220px]">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" />
                         <input
                             type="text"
                             placeholder="Örn: Spor Salonu, Pizza"
                             value={keyword}
                             onChange={(e) => setKeyword(e.target.value)}
-                            className="w-full bg-white/5 border border-white/10 text-foreground placeholder:text-muted-foreground focus:ring-1 focus:ring-primary h-12 rounded-xl outline-none pl-10 pr-3"
+                            className="w-full bg-white/5 border border-white/10 text-foreground placeholder:text-muted-foreground focus:ring-1 focus:ring-primary h-10 rounded-xl outline-none pl-10 pr-3"
                             required
                         />
                     </div>
 
-                    {/* Deep Search Toggle & Submit Button Row */}
-                    <div className="w-full flex items-center justify-between mt-4 pt-4 border-t border-white/5">
-                        <div
-                            className="flex items-center gap-3 cursor-pointer select-none group"
-                            onClick={() => {
-                                setIsDeepSearch(!isDeepSearch);
-                                setDeepSearchManuallySet(true);
-                            }}
-                        >
-                            <div className={cn(
-                                "w-12 h-7 rounded-full transition-all duration-300 relative border",
-                                isDeepSearch ? "bg-primary border-primary" : "bg-white/5 border-white/10 group-hover:bg-white/10"
-                            )}>
-                                <div className={cn(
-                                    "absolute top-1 left-1 w-5 h-5 rounded-full bg-white transition-transform shadow-sm",
-                                    isDeepSearch ? "translate-x-5" : "translate-x-0"
-                                )} />
-                            </div>
-                            <div className="flex flex-col">
-                                <span className={cn("text-sm font-bold transition-colors", isDeepSearch ? "text-primary" : "text-white/70 group-hover:text-white")}>Derin Arama</span>
-                                <span className="text-[10px] text-muted-foreground">Standart arama 60 sonuçla sınırlı • Derin Arama 10 kredi</span>
-                            </div>
-                        </div>
-
-                        <button
-                            type="submit"
-                            disabled={isLoading}
-                            className={cn(
-                                "bg-primary hover:bg-blue-600 text-white font-medium h-12 px-8 rounded-xl transition-all duration-200 flex items-center justify-center min-w-[140px] shadow-lg shadow-primary/20",
-                                isLoading && "opacity-80 cursor-not-allowed"
-                            )}
-                        >
-                            {isLoading ? (
-                                <Loader2 className="w-5 h-5 animate-spin" />
-                            ) : (
-                                <>
-                                    <Search className="w-4 h-4 mr-2" />
-                                    <span>Ara</span>
-                                </>
-                            )}
-                        </button>
-                    </div>
+                    <button
+                        type="submit"
+                        disabled={isLoading}
+                        className={cn(
+                            "bg-primary hover:bg-blue-600 text-white font-bold h-10 px-6 rounded-xl transition-all duration-200 flex items-center justify-center min-w-[120px] shadow-lg shadow-primary/20",
+                            isLoading && "opacity-80 cursor-not-allowed"
+                        )}
+                    >
+                        {isLoading ? (
+                            <Loader2 className="w-5 h-5 animate-spin" />
+                        ) : (
+                            <>
+                                <Search className="w-4 h-4 mr-2" />
+                                <span>Ara</span>
+                            </>
+                        )}
+                    </button>
                 </div> {/* End of glass-card */}
             </form >
 
             {/* Recent Searches */}
-            {
-                history.length > 0 && (
+            {showRecentSearches && history.length > 0 ? (
                     <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 animate-in fade-in slide-in-from-top-2">
                         <span className="text-xs text-muted-foreground flex items-center gap-1">
                             <History className="w-3 h-3" /> Son Aramalar:
@@ -318,8 +283,7 @@ export function SearchForm({ onSearch, isLoading, defaultDeepSearch }: SearchFor
                             </div>
                         ))}
                     </div>
-                )
-            }
+            ) : null}
         </div >
     );
 }

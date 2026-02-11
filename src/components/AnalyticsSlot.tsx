@@ -13,7 +13,7 @@ import {
     Scatter,
     ZAxis
 } from "recharts";
-import { PlaceResult } from "./ResultsTable";
+import { PlaceResult } from "@/lib/types";
 import { useMemo, useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { AnalyticsMap } from "./AnalyticsMap";
@@ -227,3 +227,61 @@ export function AnalyticsSheet({ isOpen, onClose, results }: AnalyticsSheetProps
         </>
     );
 }
+
+export function AnalyticsSlot({ results }: { results: PlaceResult[] }) {
+    const [isOpen, setIsOpen] = useState(false);
+
+    // Key Stats for Summary
+    const stats = useMemo(() => {
+        if (!results || results.length === 0) return null;
+        const totalReviews = results.reduce((acc, curr) => acc + (curr.user_ratings_total || 0), 0);
+        const avgRating = results.reduce((acc, curr) => acc + (curr.rating || 0), 0) / (results.length || 1);
+        return { totalReviews, avgRating };
+    }, [results]);
+
+    if (!results || results.length === 0) {
+        return (
+            <div className="w-full h-full flex items-center justify-center text-gray-500 text-sm">
+                Analiz için veri bekleniyor...
+            </div>
+        );
+    }
+
+    return (
+        <>
+            <div className="w-full h-full p-6 flex flex-col justify-between relative group cursor-pointer" onClick={() => setIsOpen(true)}>
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-purple-500/5 group-hover:from-blue-500/10 group-hover:to-purple-500/10 transition-all rounded-inherit" />
+
+                <div>
+                    <h3 className="text-lg font-bold text-white flex items-center gap-2 mb-1">
+                        <TrendingUp className="w-5 h-5 text-purple-400" />
+                        Pazar Analizi
+                    </h3>
+                    <p className="text-sm text-gray-400">Detaylı raporu görüntüle</p>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4 mt-4">
+                    <div className="bg-black/20 p-3 rounded-lg border border-white/5">
+                        <div className="text-[10px] text-gray-500 uppercase font-bold">Ort. Puan</div>
+                        <div className="text-xl font-bold text-white flex items-center gap-1">
+                            {stats?.avgRating.toFixed(1)} <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />
+                        </div>
+                    </div>
+                    <div className="bg-black/20 p-3 rounded-lg border border-white/5">
+                        <div className="text-[10px] text-gray-500 uppercase font-bold">Toplam Yorum</div>
+                        <div className="text-xl font-bold text-white">
+                            {(stats?.totalReviews || 0).toLocaleString()}
+                        </div>
+                    </div>
+                </div>
+
+                <div className="mt-4 flex items-center justify-center w-full py-2 rounded-lg bg-white/5 border border-white/5 text-xs font-medium text-white group-hover:bg-primary group-hover:border-primary transition-all">
+                    Raporu Aç
+                </div>
+            </div>
+
+            <AnalyticsSheet isOpen={isOpen} onClose={() => setIsOpen(false)} results={results} />
+        </>
+    );
+}
+

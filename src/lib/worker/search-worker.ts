@@ -1,9 +1,9 @@
 import { Worker, Job } from 'bullmq';
 import { redisConnection } from '../queue/config';
-import { executeSearchCore } from '@/app/actions/search-places';
+import { searchPlacesInternal } from '@/app/actions/search-places';
 import { redis } from '../redis';
 
-const QUEUE_NAME = 'search-jobs';
+const QUEUE_NAME = 'search-queue';
 
 export const setupWorker = () => {
     console.log('👷 Search Worker starting...');
@@ -12,7 +12,7 @@ export const setupWorker = () => {
         QUEUE_NAME,
         async (job: Job) => {
             const { city, keyword, userId, initialPageToken, deepSearch } = job.data;
-            const jobId = job.id;
+            const jobId = String(job.id);
 
             console.log(`[Job ${jobId}] Processing search for ${city}: ${keyword} (PageToken: ${initialPageToken ? 'Yes' : 'No'}, Deep: ${deepSearch})`);
 
@@ -21,7 +21,15 @@ export const setupWorker = () => {
                 await redis.set(`job:${jobId}:status`, 'processing', 'EX', 3600);
 
                 // 2. Execute actual search
-                const results = await executeSearchCore(city, keyword, userId, initialPageToken, deepSearch, jobId);
+                const results = await searchPlacesInternal(
+                    city,
+                    keyword,
+                    undefined,
+                    initialPageToken,
+                    userId,
+                    deepSearch,
+                    jobId
+                );
 
                 // 3. Store result and update status to completed
                 await redis.set(`job:${jobId}:result`, JSON.stringify(results), 'EX', 3600);
@@ -56,6 +64,12 @@ export const setupWorker = () => {
 // Global singleton for the worker to avoid multiple instances in Next.js HMR
 const globalForWorker = global as unknown as { searchWorker: Worker | undefined };
 
-if (!globalForWorker.searchWorker && process.env.NODE_ENV !== 'test') {
-    globalForWorker.searchWorker = setupWorker();
+export const searchWorker =
+    globalForWorker.searchWorker ||
+    (process.env.NODE_ENV !== 'test' ? setupWorker() : undefined);
+
+if (!globalForWorker.searchWorker && searchWorker) {
+    globalForWorker.searchWorker = searchWorker;
 }
+
+export default searchWorker;

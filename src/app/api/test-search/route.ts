@@ -1,8 +1,20 @@
 import { NextResponse } from "next/server";
-import { searchPlaces } from "@/app/actions/search-places";
+import { searchPlacesInternal } from "@/app/actions/search-places";
 import { prisma } from "@/lib/prisma";
 
 export async function GET(request: Request) {
+    // This endpoint is for local debugging only. It can burn credits / trigger paid API usage.
+    // Never expose in production.
+    if (process.env.NODE_ENV === "production") {
+        return NextResponse.json({ error: "Not found" }, { status: 404 });
+    }
+
+    const debugToken = request.headers.get("x-debug-token") || "";
+    const expected = process.env.DEBUG_ADMIN_TOKEN || "";
+    if (!expected || debugToken !== expected) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const { searchParams } = new URL(request.url);
     const email = searchParams.get("email");
     const city = searchParams.get("city") || "İstanbul";
@@ -22,6 +34,7 @@ export async function GET(request: Request) {
         }
 
         if (targetTier) {
+            // Tier switching is a destructive capability; keep it debug-only and explicit.
             const tierEnum = targetTier as any; // Simple cast
             await prisma.user.update({
                 where: { id: user.id },
@@ -37,7 +50,7 @@ export async function GET(request: Request) {
         console.log(`Testing search for user ${user.email} (${user.id}). Credits: ${user.credits}, Tier: ${user.subscriptionTier}`);
 
         try {
-            const results = await searchPlaces(city, keyword, undefined, pageToken, user.id, deepSearch);
+            const results = await searchPlacesInternal(city, keyword, undefined, pageToken, user.id, deepSearch);
 
             // Re-fetch user to check credit deduction
             const updatedUser = await prisma.user.findFirst({ where: { id: user.id } });
